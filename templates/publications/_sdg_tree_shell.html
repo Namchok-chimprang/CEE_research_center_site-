@@ -1,0 +1,43 @@
+{% with controls_visible=show_tree_controls|default:False %}
+<div class="section-heading">
+    <p class="eyebrow">SDG Tree</p>
+    <h2>Tree Infographic of Sustainable Development Goals</h2>
+</div>
+{% if controls_visible %}
+<div class="sdg-tree-presets" role="group" aria-label="Choose tree style">
+    <button type="button" class="sdg-tree-preset is-active" data-tree-preset="five">
+        Tree with 5 leaves
+    </button>
+    <button type="button" class="sdg-tree-preset" data-tree-preset="four">
+        Tree with 4 leaves
+    </button>
+    <button type="button" class="sdg-tree-preset" data-tree-preset="three">
+        Tree with 3 leaves
+    </button>
+</div>
+{% endif %}
+<div class="sdg-tree-shell sdg-tree-shell--canvas">
+    <div class="sdg-tree-infographic sdg-tree-infographic--solo">
+        <div class="sdg-tree-center">
+            <div class="sdg-tree-title">Tree infographic</div>
+            <div class="sdg-tree-canvas-wrap">
+                <div id="sdgTreeCanvas" class="sdg-tree-svg"{% if initial_preset %} data-initial-preset="{{ initial_preset }}"{% endif %}></div>
+            </div>
+        </div>
+    </div>
+    <div class="sdg-tree-legend">
+        {% for item in sdg_summary %}
+            <div class="sdg-legend-item {% if item.count %}sdg-legend-item--active{% endif %}">
+                <span class="sdg-legend-item__dot" style="background: {{ item.color }};"></span>
+                <div class="sdg-legend-item__body">
+                    <div class="sdg-legend-item__title">SDG {{ item.number }} {{ item.label }}</div>
+                    <div class="sdg-legend-item__count">
+                        {{ item.visual_count }} paper{{ item.visual_count|pluralize }}
+                        {% if not item.count %}<span class="small text-muted">(demo)</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endwith %}

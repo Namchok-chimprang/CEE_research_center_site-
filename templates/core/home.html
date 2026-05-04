@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home | Research Center{% endblock %}
+{% block body_class %}home-landing bg-[#070b11] text-white font-sans{% endblock %}
+{% block main_class %}home-main{% endblock %}
+
+{% block content %}
+<section class="home-top-animated home-horizontal-slider relative overflow-hidden border-b border-white/10" data-home-slider>
+    <div class="home-slider-track flex transition-transform duration-700 ease-out" data-home-slider-track>
+        <article class="home-slider-slide relative min-h-[100svh] min-w-full overflow-hidden">
+            <video class="absolute inset-0 h-full w-full object-cover" autoplay muted loop playsinline>
+                <source src="{% static 'images/home-hero-aigen2.mp4' %}" type="video/mp4">
+            </video>
+            <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,10,18,0.34)_0%,rgba(6,10,18,0.18)_36%,rgba(6,10,18,0.42)_100%)]"></div>
+            <div class="pointer-events-none absolute inset-0">
+                <div class="home-hero-glow home-hero-glow--left absolute -left-20 top-8 h-72 w-72 rounded-full bg-[#6f76ff]/22 blur-3xl"></div>
+                <div class="home-hero-glow home-hero-glow--right absolute right-0 top-0 h-96 w-96 rounded-full bg-[#6d56ff]/14 blur-3xl"></div>
+                <div class="home-hero-glow home-hero-glow--bottom absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-[#95a3ff]/14 blur-3xl"></div>
+            </div>
+            <div class="container relative flex min-h-[100svh] items-center py-6">
+                <div class="max-w-3xl home-hero-copy">
+                    <span class="home-reveal home-reveal--1 home-kicker">
+                        Center of Excellence in Econometrics
+                    </span>
+                    <h1 class="home-reveal home-reveal--2 mt-4 font-display text-6xl font-semibold leading-[0.9] text-white md:text-8xl">
+                        Start your
+                        <br>
+                        econometrics
+                        <br>
+                        journey.
+                    </h1>
+                    <p class="home-reveal home-reveal--3 home-hero-summary">
+                        Explore researchers, publications, and policy-facing insights from the Center of Excellence in Econometrics through a clearer public platform.
+                    </p>
+                    <div class="home-reveal home-reveal--4 mt-6 flex flex-wrap items-center gap-3">
+                        <a href="{% url 'core:about' %}" class="home-hero-cta home-hero-cta--primary">
+                            Learn More
+                        </a>
+                        <a href="{% url 'contacts:contact' %}" class="home-hero-cta home-hero-cta--secondary">
+                            Contact the Center
+                        </a>
+                    </div>
+                    <div class="home-reveal home-reveal--5 mt-8 grid max-w-3xl gap-3 sm:grid-cols-3">
+                        <div class="home-stat-card">
+                            <div class="home-count text-3xl font-semibold text-white" data-target="{{ researcher_count }}">0</div>
+                            <div class="mt-2 text-sm uppercase tracking-[0.18em] text-white/45">Researchers</div>
+                        </div>
+                        <div class="home-stat-card">
+                            <div class="home-count text-3xl font-semibold text-white" data-target="{{ publication_count }}">0</div>
+                            <div class="mt-2 text-sm uppercase tracking-[0.18em] text-white/45">Publications</div>
+                        </div>
+                        <div class="home-stat-card">
+                            <div class="home-count text-3xl font-semibold text-white" data-target="{{ news_count }}">0</div>
+                            <div class="mt-2 text-sm uppercase tracking-[0.18em] text-white/45">News</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="home-slider-slide relative min-h-[100svh] min-w-full overflow-hidden bg-[#08111a]">
+            <video class="absolute inset-0 h-full w-full object-cover" autoplay muted loop playsinline>
+                <source src="{% static 'images/home-hero-2.mp4' %}" type="video/mp4">
+            </video>
+            <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(6,12,24,0.78)_0%,rgba(10,23,38,0.66)_42%,rgba(6,12,24,0.55)_100%)]"></div>
+            <div class="container relative flex min-h-[100svh] items-center py-6">
+                <div class="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+                    <div class="max-w-2xl">
+                        <span class="inline-flex rounded-full border border-white/20 bg-white/6 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-white/68">
+                            Research Teams
+                        </span>
+                        <h2 class="mt-8 font-display text-5xl font-semibold leading-[0.94] text-white md:text-7xl">
+                            Build evidence,
+                            <br>
+                            model risk,
+                            <br>
+                            inform policy.
+                        </h2>
+                        <p class="mt-6 max-w-xl text-lg leading-8 text-white/68">
+                            Showcase the center's research groups, econometric expertise, and active collaborations in a single horizontal story.
+                        </p>
+                    </div>
+                    <div class="grid gap-5 md:grid-cols-2">
+                        <div class="rounded-[1.8rem] border border-white/10 bg-white/7 p-6 backdrop-blur-md">
+                            <div class="text-xs uppercase tracking-[0.2em] text-white/45">Core Areas</div>
+                            <div class="mt-3 text-2xl font-semibold text-white">Time series, policy evaluation, applied microeconometrics</div>
+                        </div>
+                        <div class="rounded-[1.8rem] border border-white/10 bg-white/7 p-6 backdrop-blur-md">
+                            <div class="text-xs uppercase tracking-[0.2em] text-white/45">Outputs</div>
+                            <div class="mt-3 text-2xl font-semibold text-white">Journal papers, working papers, policy briefs, workshops</div>
+                        </div>
+                        <div class="rounded-[1.8rem] border border-white/10 bg-white/7 p-6 backdrop-blur-md md:col-span-2">
+                            <div class="text-xs uppercase tracking-[0.2em] text-white/45">Why this matters</div>
+                            <div class="mt-3 text-lg leading-8 text-white/70">
+                                The top section can now move horizontally so the homepage feels like a guided presentation instead of a static banner.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article class="home-slider-slide relative min-h-[100svh] min-w-full overflow-hidden bg-[linear-gradient(135deg,#130d23_0%,#2a1f49_44%,#5f56a5_100%)]">
+            <div class="absolute inset-0 opacity-20">
+                <div class="absolute left-[8%] bottom-[14%] h-72 w-72 rounded-full bg-fuchsia-400 blur-3xl"></div>
+                <div class="absolute right-[12%] top-[18%] h-60 w-60 rounded-full bg-indigo-300 blur-3xl"></div>
+            </div>
+            <div class="container relative flex min-h-[100svh] items-center py-6">
+                <div class="max-w-3xl">
+                    <span class="inline-flex rounded-full border border-white/20 bg-white/6 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-white/68">
+                        Publications and Impact
+                    </span>
+                    <h2 class="mt-8 font-display text-5xl font-semibold leading-[0.94] text-white md:text-7xl">
+                        From datasets
+                        <br>
+                        to decisions.
+                    </h2>
+                    <p class="mt-6 max-w-2xl text-lg leading-8 text-white/70">
+                        Use the homepage slider to introduce your publication archive, SDG storytelling, and the policy relevance of the center's work before visitors scroll down.
+                    </p>
+                    <div class="mt-10 flex flex-wrap gap-4">
+                        <a href="{% url 'publications:list' %}" class="inline-flex items-center rounded-full bg-white px-8 py-3 text-sm font-semibold text-black transition hover:bg-white/90">
+                            Browse Publications
+                        </a>
+                        <a href="{% url 'news:list' %}" class="inline-flex items-center rounded-full border border-white/20 px-8 py-3 text-sm font-semibold text-white transition hover:bg-white/8">
+                            Latest News
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+
+    <div class="home-slider-controls">
+        <button type="button" class="home-slider-btn" data-home-slider-prev aria-label="Previous slide">Prev</button>
+        <div class="home-slider-dots" aria-label="Hero slides">
+            <button type="button" class="home-slider-dot is-active" data-home-slider-dot="0" aria-label="Go to slide 1"></button>
+            <button type="button" class="home-slider-dot" data-home-slider-dot="1" aria-label="Go to slide 2"></button>
+            <button type="button" class="home-slider-dot" data-home-slider-dot="2" aria-label="Go to slide 3"></button>
+        </div>
+        <button type="button" class="home-slider-btn" data-home-slider-next aria-label="Next slide">Next</button>
+    </div>
+</section>
+
+<section class="bg-[#070b11] py-20">
+    <div class="container">
+        <div class="mb-10 max-w-3xl">
+            <p class="text-xs uppercase tracking-[0.28em] text-[#f0d8ad]/80">Homepage Strategy</p>
+            <h2 class="mt-4 font-display text-4xl text-white md:text-5xl">A front page that reads like a curated research platform</h2>
+            <p class="mt-5 text-lg leading-8 text-white/62">
+                The structure below keeps the homepage focused: explain the center, surface important work, and make the next click obvious.
+            </p>
+        </div>
+        <div class="grid gap-6 lg:grid-cols-3">
+            <article class="rounded-[1.8rem] border border-white/10 bg-white/5 p-7 backdrop-blur-md">
+                <div class="text-4xl font-semibold text-[#f0d8ad]">01</div>
+                <h3 class="mt-6 text-2xl font-semibold text-white">Show people clearly</h3>
+                <p class="mt-4 leading-7 text-white/62">
+                    Let visitors understand the center's leadership, research teams, and the people behind each project.
+                </p>
+            </article>
+            <article class="rounded-[1.8rem] border border-white/10 bg-white/5 p-7 backdrop-blur-md">
+                <div class="text-4xl font-semibold text-[#f0d8ad]">02</div>
+                <h3 class="mt-6 text-2xl font-semibold text-white">Turn outputs into a narrative</h3>
+                <p class="mt-4 leading-7 text-white/62">
+                    Publications should feel like a body of work with direction, not a buried list of records.
+                </p>
+            </article>
+            <article class="rounded-[1.8rem] border border-white/10 bg-white/5 p-7 backdrop-blur-md">
+                <div class="text-4xl font-semibold text-[#f0d8ad]">03</div>
+                <h3 class="mt-6 text-2xl font-semibold text-white">Build for future integrations</h3>
+                <p class="mt-4 leading-7 text-white/62">
+                    Once the data is structured well, it becomes much easier to layer APIs, dashboards, and MCP assistants on top.
+                </p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="border-y border-white/8 bg-[#0b1118] py-20">
+    <div class="container">
+        <div class="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+            <div class="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-8">
+                <p class="text-xs uppercase tracking-[0.28em] text-emerald-300/85">Platform View</p>
+                <h2 class="mt-5 font-display text-4xl text-white md:text-5xl">What visitors should understand within the first minute</h2>
+                <p class="mt-5 max-w-2xl text-lg leading-8 text-white/62">
+                    A strong research-center homepage should answer three questions quickly: who the center is, what it studies, and where to go next.
+                </p>
+                <div class="mt-8 grid gap-4 sm:grid-cols-2">
+                    <div class="rounded-3xl border border-white/10 bg-black/20 p-5">
+                        <div class="text-xs uppercase tracking-[0.2em] text-white/45">People</div>
+                        <div class="mt-2 text-xl text-white">Researchers and teams</div>
+                    </div>
+                    <div class="rounded-3xl border border-white/10 bg-black/20 p-5">
+                        <div class="text-xs uppercase tracking-[0.2em] text-white/45">Outputs</div>
+                        <div class="mt-2 text-xl text-white">Publications with context</div>
+                    </div>
+                    <div class="rounded-3xl border border-white/10 bg-black/20 p-5">
+                        <div class="text-xs uppercase tracking-[0.2em] text-white/45">Outreach</div>
+                        <div class="mt-2 text-xl text-white">News and events</div>
+                    </div>
+                    <div class="rounded-3xl border border-white/10 bg-black/20 p-5">
+                        <div class="text-xs uppercase tracking-[0.2em] text-white/45">Future</div>
+                        <div class="mt-2 text-xl text-white">API and MCP ready</div>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <a class="inline-flex items-center rounded-full border border-white/15 px-7 py-3 text-sm font-semibold text-white transition hover:bg-white/8" href="{% url 'core:about' %}">
+                        About the Center
+                    </a>
+                </div>
+            </div>
+            <div class="grid gap-6">
+                <div class="rounded-[2rem] border border-white/10 bg-[#0e1620] p-8">
+                    <p class="text-xs uppercase tracking-[0.22em] text-[#f0d8ad]/85">Featured Work</p>
+                    <h3 class="mt-4 text-2xl font-semibold text-white">Highlighted Publications</h3>
+                    <p class="mt-3 text-white/58">Curated outputs that communicate the center's research direction at a glance.</p>
+                    <div class="mt-6 text-sm text-white/45">Currently showing {{ featured_publications|length }} featured record{{ featured_publications|length|pluralize }}.</div>
+                </div>
+                <div class="rounded-[2rem] border border-white/10 bg-[#0e1620] p-8">
+                    <p class="text-xs uppercase tracking-[0.22em] text-emerald-300/85">Live Updates</p>
+                    <h3 class="mt-4 text-2xl font-semibold text-white">News and public activity</h3>
+                    <p class="mt-3 text-white/58">Use current updates to make the site feel active, transparent, and engaged with the outside world.</p>
+                    <div class="mt-6 text-sm text-white/45">Currently showing {{ latest_news|length }} recent stor{{ latest_news|length|pluralize:"y,ies" }}.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bg-[#070b11] py-20">
+    <div class="container">
+        <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div>
+                <p class="text-xs uppercase tracking-[0.28em] text-[#f0d8ad]/80">Featured Work</p>
+                <h2 class="mt-3 font-display text-4xl text-white">Highlighted Publications</h2>
+            </div>
+            <a href="{% url 'publications:list' %}" class="text-sm font-semibold text-white/70 hover:text-white">All publications</a>
+        </div>
+        <div class="grid gap-6 md:grid-cols-3">
+            {% for publication in featured_publications %}
+                <div class="rounded-[1.8rem] border border-white/10 bg-white/5 p-6 backdrop-blur-md">
+                    <p class="text-xs uppercase tracking-[0.22em] text-emerald-300/85">Publication</p>
+                    <h3 class="mt-4 text-xl font-semibold leading-8 text-white">{{ publication.title }}</h3>
+                    <p class="mt-4 text-sm leading-7 text-white/68">{{ publication.authors }}</p>
+                    <p class="mt-2 text-sm text-white/45">{{ publication.journal|default:"Journal information pending" }}</p>
+                    <div class="mt-6">
+                        <a href="{% url 'publications:detail' publication.pk %}" class="stretched-link">Read more</a>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-white/55">No featured publications yet. Add some data in Django admin.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="border-y border-white/8 bg-[#0b1118] py-20">
+    <div class="container">
+        <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div>
+                <p class="text-xs uppercase tracking-[0.28em] text-[#f0d8ad]/80">People</p>
+                <h2 class="mt-3 font-display text-4xl text-white">Researchers</h2>
+            </div>
+            <a href="{% url 'researchers:list' %}" class="text-sm font-semibold text-white/70 hover:text-white">All researchers</a>
+        </div>
+        <div class="grid gap-6 md:grid-cols-3">
+            {% for researcher in featured_researchers %}
+                <div class="rounded-[1.8rem] border border-white/10 bg-white/5 p-6 backdrop-blur-md">
+                    <div class="grid gap-5">
+                        <div class="overflow-hidden rounded-[1.4rem] border border-white/8 bg-[linear-gradient(180deg,#171d27,#0f141b)]">
+                            <div class="flex h-72 items-end justify-center">
+                                {% if researcher.profile_image %}
+                                    <img src="{{ researcher.profile_image.url }}" alt="{{ researcher.full_name }}" class="h-full w-full object-contain object-bottom">
+                                {% else %}
+                                    <div class="grid h-full w-full place-items-center text-5xl font-semibold text-white/80">{{ researcher.full_name|slice:":1" }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.22em] text-emerald-300/85">Profile</p>
+                            <h3 class="mt-3 text-2xl font-semibold text-white">{{ researcher.full_name }}</h3>
+                            <p class="mt-2 text-white/72">{{ researcher.position }}</p>
+                            <p class="mt-4 text-sm leading-7 text-white/52">{{ researcher.expertise|default:"Add expertise in admin" }}</p>
+                            <div class="mt-6">
+                                <a href="{% url 'researchers:detail' researcher.pk %}" class="stretched-link">View profile</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-white/55">No researchers yet. Add them in Django admin.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="bg-[#070b11] py-20">
+    <div class="container">
+        <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div>
+                <p class="text-xs uppercase tracking-[0.28em] text-[#f0d8ad]/80">Updates</p>
+                <h2 class="mt-3 font-display text-4xl text-white">Latest News</h2>
+            </div>
+            <a href="{% url 'news:list' %}" class="text-sm font-semibold text-white/70 hover:text-white">All news</a>
+        </div>
+        <div class="grid gap-6 md:grid-cols-3">
+            {% for item in latest_news %}
+                <div class="rounded-[1.8rem] border border-white/10 bg-white/5 p-6 backdrop-blur-md">
+                    <p class="text-xs uppercase tracking-[0.22em] text-emerald-300/85">News</p>
+                    <h3 class="mt-4 text-xl font-semibold leading-8 text-white">{{ item.title }}</h3>
+                    <p class="mt-4 text-sm leading-7 text-white/56">{{ item.summary|truncatewords:22 }}</p>
+                    <div class="mt-6">
+                        <a href="{% url 'news:detail' item.slug %}" class="stretched-link">Read article</a>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-white/55">No news published yet. Add some entries in Django admin.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    const hero = document.querySelector('.home-top-animated');
+    const glows = document.querySelectorAll('.home-hero-glow');
+    const counts = document.querySelectorAll('.home-count');
+    const slider = document.querySelector('[data-home-slider]');
+    const track = document.querySelector('[data-home-slider-track]');
+    const prevButton = document.querySelector('[data-home-slider-prev]');
+    const nextButton = document.querySelector('[data-home-slider-next]');
+    const dots = Array.from(document.querySelectorAll('[data-home-slider-dot]'));
+    let activeIndex = 0;
+
+    counts.forEach((node) => {
+        const target = Number(node.dataset.target || 0);
+        const duration = 1300;
+        const start = performance.now();
+
+        function step(now) {
+            const progress = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            node.textContent = Math.round(target * eased);
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            }
+        }
+
+        requestAnimationFrame(step);
+    });
+
+    if (!hero) {
+        return;
+    }
+
+    function updateSlider(index) {
+        if (!track) return;
+        const maxIndex = dots.length - 1;
+        activeIndex = Math.max(0, Math.min(index, maxIndex));
+        track.style.transform = `translateX(-${activeIndex * 100}%)`;
+        dots.forEach((dot, dotIndex) => {
+            dot.classList.toggle('is-active', dotIndex === activeIndex);
+        });
+    }
+
+    if (prevButton) {
+        prevButton.addEventListener('click', function () {
+            updateSlider(activeIndex - 1);
+        });
+    }
+
+    if (nextButton) {
+        nextButton.addEventListener('click', function () {
+            updateSlider(activeIndex + 1);
+        });
+    }
+
+    dots.forEach((dot) => {
+        dot.addEventListener('click', function () {
+            updateSlider(Number(dot.dataset.homeSliderDot || 0));
+        });
+    });
+
+    hero.addEventListener('mousemove', function (event) {
+        const rect = hero.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width - 0.5;
+        const y = (event.clientY - rect.top) / rect.height - 0.5;
+
+        glows.forEach((glow, index) => {
+            const depth = (index + 1) * 10;
+            glow.style.transform = `translate3d(${x * depth}px, ${y * depth}px, 0)`;
+        });
+    });
+
+    hero.addEventListener('mouseleave', function () {
+        glows.forEach((glow) => {
+            glow.style.transform = '';
+        });
+    });
+
+    let touchStartX = null;
+    hero.addEventListener('touchstart', function (event) {
+        touchStartX = event.changedTouches[0].clientX;
+    }, { passive: true });
+
+    hero.addEventListener('touchend', function (event) {
+        if (touchStartX === null) return;
+        const deltaX = event.changedTouches[0].clientX - touchStartX;
+        if (deltaX > 40) updateSlider(activeIndex - 1);
+        if (deltaX < -40) updateSlider(activeIndex + 1);
+        touchStartX = null;
+    }, { passive: true });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Contact | Research Center{% endblock %}
+
+{% block content %}
+<section class="content-hero py-5 py-lg-6">
+    <div class="container">
+        <div class="contact-grid">
+            <div class="content-card content-card--dark">
+                <span class="content-card__eyebrow">Contact</span>
+                <h1 class="display-5 fw-bold">ติดต่อศูนย์วิจัย</h1>
+                <p class="mb-4">
+                    หากต้องการสอบถามข้อมูลเกี่ยวกับงานวิจัย ความร่วมมือทางวิชาการ การเชิญบรรยาย
+                    หรือการประสานงานด้านข้อมูล สามารถติดต่อผ่านรายละเอียดด้านล่างหรือส่งข้อความผ่านแบบฟอร์มได้ทันที
+                </p>
+
+                <div class="contact-item">
+                    <span class="contact-item__label">Email</span>
+                    <strong>research.center@example.com</strong>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-item__label">Phone</span>
+                    <strong>02-000-0000</strong>
+                </div>
+                <div class="contact-item">
+                    <span class="contact-item__label">Address</span>
+                    <strong>Research Center Office, Faculty / University Address</strong>
+                </div>
+            </div>
+
+            <div class="contact-form-shell">
+                <div class="mb-4">
+                    <p class="eyebrow mb-2">Send a Message</p>
+                    <h2 class="h3 mb-2">ฝากข้อความถึงเรา</h2>
+                    <p class="text-secondary mb-0">กรอกข้อมูลให้ครบ แล้วทีมงานจะติดต่อกลับตามช่องทางที่คุณระบุไว้</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label" for="name">Name</label>
+                        <input class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="email">Email</label>
+                        <input class="form-control" id="email" name="email" type="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="subject">Subject</label>
+                        <input class="form-control" id="subject" name="subject" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label" for="message">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="6" required></textarea>
+                    </div>
+                    <button class="btn btn-dark" type="submit">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}{{ news_item.title }} | Research Center{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <a href="{% url 'news:list' %}" class="text-decoration-none">&larr; Back to news</a>
+        <article class="news-detail-shell mt-4">
+            {% if news_item.cover_image %}
+                <div class="news-detail-shell__media">
+                    <img src="{{ news_item.cover_image.url }}" alt="{{ news_item.title }}">
+                </div>
+            {% endif %}
+
+            <div class="news-detail-shell__content">
+                <p class="eyebrow mb-2">News Detail</p>
+                <h1 class="mb-2">{{ news_item.title }}</h1>
+                <p class="text-muted mb-3">{{ news_item.published_at|date:"d M Y H:i"|default:"Draft" }}</p>
+                {% if news_item.summary %}
+                    <p class="lead">{{ news_item.summary }}</p>
+                {% endif %}
+                <div class="news-detail-body">{{ news_item.content|linebreaks }}</div>
+            </div>
+        </article>
+
+        {% if related_items %}
+            <div class="mt-5">
+                <div class="section-heading">
+                    <p class="eyebrow">Related</p>
+                    <h2>More News</h2>
+                </div>
+                <div class="row g-4">
+                    {% for item in related_items %}
+                        <div class="col-md-6 col-xl-4">
+                            <article class="news-list-card h-100">
+                                <a href="{% url 'news:detail' item.slug %}" class="news-list-card__media">
+                                    {% if item.cover_image %}
+                                        <img src="{{ item.cover_image.url }}" alt="{{ item.title }}">
+                                    {% else %}
+                                        <div class="news-list-card__placeholder">{{ item.title|slice:":1" }}</div>
+                                    {% endif %}
+                                </a>
+                                <div class="news-list-card__body">
+                                    <p class="news-list-card__date">{{ item.published_at|date:"d M Y"|default:"Draft" }}</p>
+                                    <h3 class="h5">{{ item.title }}</h3>
+                                    <p>{{ item.summary|default:item.content|truncatewords:18 }}</p>
+                                    <a href="{% url 'news:detail' item.slug %}" class="stretched-link">Read more</a>
+                                </div>
+                            </article>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

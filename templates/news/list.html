@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}News | Research Center{% endblock %}
+
+{% block content %}
+<section class="content-hero py-5">
+    <div class="container">
+        <div class="row g-4 align-items-end">
+            <div class="col-lg-8">
+                <p class="eyebrow">Updates</p>
+                <h1 class="display-5 fw-bold mb-3">News and Activities</h1>
+                <p class="lead text-secondary mb-0">Latest announcements, events, and activities from the research center.</p>
+            </div>
+            <div class="col-lg-4">
+                <form method="get" class="news-filter-card">
+                    <label for="news-search" class="news-filter-card__label">Search</label>
+                    <input id="news-search" type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search title or content">
+                    <label for="news-year" class="news-filter-card__label mt-3">Year</label>
+                    <select id="news-year" name="year" class="form-control">
+                        <option value="">All years</option>
+                        {% for year in available_years %}
+                            <option value="{{ year }}" {% if selected_year == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="news-filter-card__actions">
+                        <button type="submit" class="btn btn-dark btn-sm">Apply</button>
+                        <a href="{% url 'news:list' %}" class="btn btn-outline-dark btn-sm">Reset</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        {% if featured_news %}
+            <article class="news-feature-card mb-4">
+                <a href="{% url 'news:detail' featured_news.slug %}" class="news-feature-card__media">
+                    {% if featured_news.cover_image %}
+                        <img src="{{ featured_news.cover_image.url }}" alt="{{ featured_news.title }}">
+                    {% else %}
+                        <div class="news-feature-card__placeholder">{{ featured_news.title|slice:":1" }}</div>
+                    {% endif %}
+                </a>
+                <div class="news-feature-card__content">
+                    <p class="eyebrow mb-2">Featured News</p>
+                    <h2>{{ featured_news.title }}</h2>
+                    <p class="text-muted mb-2">{{ featured_news.published_at|date:"d M Y"|default:"Draft" }}</p>
+                    <p class="mb-0">{{ featured_news.summary|default:featured_news.content|truncatewords:45 }}</p>
+                    <a href="{% url 'news:detail' featured_news.slug %}" class="stretched-link">Read featured story</a>
+                </div>
+            </article>
+        {% endif %}
+
+        <div class="row g-4">
+            {% for item in news_items %}
+                <div class="col-md-6 col-xl-4">
+                    <article class="news-list-card h-100">
+                        <a href="{% url 'news:detail' item.slug %}" class="news-list-card__media">
+                            {% if item.cover_image %}
+                                <img src="{{ item.cover_image.url }}" alt="{{ item.title }}">
+                            {% else %}
+                                <div class="news-list-card__placeholder">{{ item.title|slice:":1" }}</div>
+                            {% endif %}
+                        </a>
+                        <div class="news-list-card__body">
+                            <p class="news-list-card__date">{{ item.published_at|date:"d M Y"|default:"Draft" }}</p>
+                            <h2 class="h5">{{ item.title }}</h2>
+                            <p>{{ item.summary|default:item.content|truncatewords:24 }}</p>
+                            <a href="{% url 'news:detail' item.slug %}" class="stretched-link">Read more</a>
+                        </div>
+                    </article>
+                </div>
+            {% empty %}
+                <p class="text-muted">No news found for the selected filters.</p>
+            {% endfor %}
+        </div>
+
+        {% if page_obj.paginator.num_pages > 1 %}
+            <nav class="news-pagination mt-4" aria-label="News pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if selected_year %}year={{ selected_year }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+                {% endif %}
+
+                <span class="news-pagination__status">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+                {% if page_obj.has_next %}
+                    <a href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if selected_year %}year={{ selected_year }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+                {% endif %}
+            </nav>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

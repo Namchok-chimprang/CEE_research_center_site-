@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}{{ researcher.full_name }} | Research Center{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <a href="{% url 'researchers:list' %}" class="text-decoration-none">&larr; Back to researchers</a>
+        <div class="researcher-detail-shell mt-4">
+            <div class="researcher-detail-shell__media">
+                {% if researcher.profile_image %}
+                    <img src="{{ researcher.profile_image.url }}" alt="{{ researcher.full_name }}">
+                {% else %}
+                    <div class="researcher-detail-shell__placeholder">{{ researcher.full_name|slice:":1" }}</div>
+                {% endif %}
+            </div>
+            <div class="researcher-detail-shell__content">
+                <p class="eyebrow">{{ researcher.get_organization_role_display }}</p>
+                <h1 class="mt-2">{{ researcher.profile_label }}</h1>
+                <p class="lead">{{ researcher.position }}</p>
+                {% if researcher.team_name %}
+                    <p><strong>Team:</strong> {{ researcher.team_name }}</p>
+                {% endif %}
+                {% if researcher.academic_status %}
+                    <p><strong>Academic Status:</strong> {{ researcher.academic_status }}</p>
+                {% endif %}
+                <p><strong>Expertise:</strong> {{ researcher.expertise|default:"-" }}</p>
+                <p><strong>Email:</strong> {{ researcher.email|default:"-" }}</p>
+                <p><strong>Phone:</strong> {{ researcher.phone|default:"-" }}</p>
+                <div class="mt-4">
+                    <h2 class="h5">Biography</h2>
+                    <p>{{ researcher.bio|default:"No biography yet." }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,423 @@
+{% extends "base.html" %}
+
+{% block title %}Researchers | Research Center{% endblock %}
+
+{% block extra_head %}
+{{ researcher_groups|json_script:"researcher-groups-data" }}
+{% endblock %}
+
+{% block content %}
+<section class="researchers-hero py-5 py-lg-6">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-7">
+                <p class="eyebrow">People and Structure</p>
+                <h1 class="display-5 fw-bold">Research Center Organization</h1>
+                <p class="lead text-secondary">
+                    This page follows the organization map directly. Assign each researcher to the correct team, then click a unit to open the people inside it.
+                </p>
+            </div>
+            <div class="col-lg-5">
+                <div class="org-summary-card">
+                    <div class="row g-3 text-center">
+                        <div class="col-4">
+                            <div class="stat-number">{{ org_chart.executive.count }}</div>
+                            <div class="text-muted small">Executive</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-number">{{ unit_count }}</div>
+                            <div class="text-muted small">Units</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-number">{{ researchers|length }}</div>
+                            <div class="text-muted small">People</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="section-heading">
+            <p class="eyebrow">Interactive Map</p>
+            <h2>Organization Chart</h2>
+        </div>
+
+        <div class="org-chart-shell org-chart-shell--fixed">
+            <div class="org-chart-shell__hint">Click any box to open the people assigned to that team.</div>
+
+            <div class="org-chart-stage">
+                <svg class="org-chart-svg" viewBox="0 0 1000 540" aria-hidden="true" preserveAspectRatio="none">
+                    <path d="M500 56 L500 120" />
+                    <path d="M150 96 L850 96" />
+                    <path d="M150 96 L150 120" />
+                    <path d="M850 96 L850 120" />
+                    <path d="M150 234 L150 317" />
+                    <path d="M150 317 L850 317" />
+                    <path d="M850 234 L850 317" />
+                    <path d="M500 234 L500 280" />
+                    <path d="M500 354 L500 467" />
+                    <path d="M245 467 L755 467" />
+                </svg>
+
+                <div class="org-chart-row org-chart-row--top">
+                    <button type="button" class="org-node org-node--executive" data-group-key="{{ org_chart.executive.key }}">
+                        <span class="org-node__title">{{ org_chart.executive.label }}</span>
+                        <span class="org-node__meta">{{ org_chart.executive.count }} members</span>
+                    </button>
+                </div>
+
+                <div class="org-chart-row org-chart-row--teams">
+                    {% for group in org_chart.top_teams %}
+                        <button type="button" class="org-node org-node--team" data-group-key="{{ group.key }}">
+                            <span class="org-node__title">{{ group.label }}</span>
+                            <span class="org-node__meta">{{ group.count }} members</span>
+                        </button>
+                    {% endfor %}
+                </div>
+
+                <div class="org-chart-row org-chart-row--support">
+                    <div class="org-node org-node--support org-node--support-label">
+                        <span class="org-node__title">{{ org_chart.support.label }}</span>
+                        <span class="org-node__meta">Technical &amp; Part-time units supporting the teams above</span>
+                    </div>
+                </div>
+
+                <div class="org-chart-row org-chart-row--bottom">
+                    {% for group in org_chart.bottom_teams %}
+                        <button type="button" class="org-node org-node--support" data-group-key="{{ group.key }}">
+                            <span class="org-node__title">{{ group.label }}</span>
+                            <span class="org-node__meta">{{ group.count }} members</span>
+                        </button>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="researcher-mini-grid mt-5">
+            {% for group in researcher_groups %}
+                {% if group.key != "executive" and group.key != "support" %}
+                    <article class="researcher-mini-card">
+                        <p class="eyebrow mb-2">Unit</p>
+                        <h3>{{ group.label }}</h3>
+                        <p class="text-muted mb-2">{{ group.description }}</p>
+                        <p class="mb-0">{{ group.count }} members</p>
+                        {% if group.interactive and group.count %}
+                            <button type="button" class="btn btn-outline-dark btn-sm mt-3" data-group-key="{{ group.key }}">
+                                Open profiles
+                            </button>
+                        {% endif %}
+                    </article>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<div class="org-profile-modal" data-org-modal hidden>
+    <div class="org-profile-modal__backdrop" data-org-close></div>
+    <div class="org-profile-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="orgProfileGroupTitle">
+        <button type="button" class="org-profile-modal__close" data-org-close aria-label="Close">&times;</button>
+
+        <div class="org-profile-modal__header">
+            <div>
+                <p class="eyebrow mb-1" data-org-group-theme>Organization Unit</p>
+                <h2 id="orgProfileGroupTitle" class="mb-0" data-org-group-title>Select a team</h2>
+            </div>
+            <div class="org-profile-modal__counter" data-org-member-counter></div>
+        </div>
+
+        <div class="org-profile-showcase">
+            <div class="org-profile-showcase__info">
+                <div class="org-profile-showcase__panel">
+                    <h3 data-org-member-name>Member name</h3>
+                    <p class="org-profile-showcase__role" data-org-member-role>Role</p>
+                    <p class="org-profile-showcase__position" data-org-member-position></p>
+                    <p class="org-profile-showcase__team" data-org-member-team></p>
+
+                    <div class="org-profile-showcase__fields" data-org-member-fields></div>
+
+                    <div class="org-profile-showcase__contacts">
+                        <a href="#" data-org-member-link class="org-profile-showcase__link">Open full profile</a>
+                        <span data-org-member-email></span>
+                        <span data-org-member-phone></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="org-profile-showcase__media">
+                <div class="org-profile-showcase__image-wrap">
+                    <img src="" alt="" data-org-member-image hidden>
+                    <div class="org-profile-showcase__placeholder" data-org-member-placeholder></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="org-profile-modal__footer">
+            <button type="button" class="org-profile-modal__nav" data-org-prev>Previous</button>
+            <div class="org-profile-modal__dots" data-org-dots></div>
+            <button type="button" class="org-profile-modal__nav" data-org-next>Next</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    const dataNode = document.getElementById("researcher-groups-data");
+    const modal = document.querySelector("[data-org-modal]");
+    if (!dataNode || !modal) return;
+
+    const groups = JSON.parse(dataNode.textContent || "[]");
+    const groupsByKey = Object.fromEntries(groups.map((group) => [group.key, group]));
+
+    const titleNode = modal.querySelector("[data-org-group-title]");
+    const themeNode = modal.querySelector("[data-org-group-theme]");
+    const counterNode = modal.querySelector("[data-org-member-counter]");
+    const nameNode = modal.querySelector("[data-org-member-name]");
+    const roleNode = modal.querySelector("[data-org-member-role]");
+    const positionNode = modal.querySelector("[data-org-member-position]");
+    const teamNode = modal.querySelector("[data-org-member-team]");
+    const fieldsNode = modal.querySelector("[data-org-member-fields]");
+    const linkNode = modal.querySelector("[data-org-member-link]");
+    const emailNode = modal.querySelector("[data-org-member-email]");
+    const phoneNode = modal.querySelector("[data-org-member-phone]");
+    const imageNode = modal.querySelector("[data-org-member-image]");
+    const placeholderNode = modal.querySelector("[data-org-member-placeholder]");
+    const dotsNode = modal.querySelector("[data-org-dots]");
+
+    const showcaseNode = modal.querySelector(".org-profile-showcase");
+    const mediaNode = modal.querySelector(".org-profile-showcase__media");
+    let activeGroup = null;
+    let activePage = 0;
+
+    function escapeHtml(value) {
+        return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    function memberFieldsMarkup(member) {
+        const items = [];
+        if (member.expertise_items && member.expertise_items.length) {
+            items.push(
+                '<div><strong>Field</strong><ul>' +
+                member.expertise_items.map((item) => `<li>${escapeHtml(item)}</li>`).join("") +
+                '</ul></div>'
+            );
+        } else if (member.expertise) {
+            items.push(`<div><strong>Field</strong><p>${escapeHtml(member.expertise)}</p></div>`);
+        }
+        if (member.academic_status) {
+            items.push(`<div><strong>Academic status</strong><p>${escapeHtml(member.academic_status)}</p></div>`);
+        }
+        if (member.bio) {
+            items.push(`<div><strong>About</strong><p>${escapeHtml(member.bio)}</p></div>`);
+        }
+        return items.join("");
+    }
+
+    function getPageCount() {
+        if (!activeGroup) return 0;
+        if (hasOverviewPage()) {
+            return activeGroup.members.length + 1;
+        }
+        return activeGroup.members.length;
+    }
+
+    function hasOverviewPage() {
+        if (!activeGroup) return false;
+        return activeGroup.key !== "support";
+    }
+
+    function isOverviewPage() {
+        return hasOverviewPage() && activePage === 0;
+    }
+
+    function getMemberIndexFromPage() {
+        if (!activeGroup) return 0;
+        if (hasOverviewPage()) {
+            return Math.max(0, activePage - 1);
+        }
+        return activePage;
+    }
+
+    function executiveOverviewMarkup(group) {
+        function splitNameLines(rawName) {
+            const name = String(rawName || "").trim();
+            if (!name) return { prefixLine: "", nameLine: "" };
+            const assocProfPattern = /^(assoc\.?|associate)\s*prof\.?(essor)?/i;
+            if (assocProfPattern.test(name)) {
+                const stripped = name.replace(assocProfPattern, "").replace(/^[\s.,-]+/, "").trim();
+                return {
+                    prefixLine: "Associate Professor",
+                    nameLine: stripped || name,
+                };
+            }
+            return { prefixLine: "", nameLine: name };
+        }
+
+        const cards = group.members.map((member) => {
+            const safeName = escapeHtml(member.name);
+            const safeRole = escapeHtml(member.role || "");
+            const safePosition = escapeHtml(member.position || "");
+            const safeProfileUrl = escapeHtml(member.profile_url || "#");
+            const safeImage = escapeHtml(member.image_url || "");
+            const hasImage = Boolean(member.image_url);
+            const initial = escapeHtml((member.full_name || member.name || "?").trim().charAt(0).toUpperCase());
+            const mainPosition = safePosition || safeRole;
+            const nameLines = splitNameLines(member.name || "");
+            const prefixLine = escapeHtml(nameLines.prefixLine);
+            const personLine = escapeHtml(nameLines.nameLine || member.name || "");
+            const mediaMarkup = hasImage
+                ? `<img src="${safeImage}" alt="${safeName}" loading="lazy">`
+                : `<div class="org-overview-tile__placeholder">${initial}</div>`;
+            return (
+                '<article class="org-overview-tile">' +
+                    '<div class="org-overview-tile__media">' +
+                        `<a class="org-overview-tile__media-link" href="${safeProfileUrl}" aria-label="Open profile of ${safeName}">${mediaMarkup}</a>` +
+                    '</div>' +
+                    '<div class="org-overview-tile__panel">' +
+                        (prefixLine ? `<p class="org-overview-tile__prefix">${prefixLine}</p>` : "") +
+                        `<p class="org-overview-tile__name">${personLine}</p>` +
+                        (mainPosition ? `<p class="org-overview-tile__line">${mainPosition}</p>` : "") +
+                    '</div>' +
+                '</article>'
+            );
+        }).join("");
+        return `<div class="org-overview-grid">${cards}</div>`;
+    }
+
+    function renderDots() {
+        dotsNode.innerHTML = "";
+        const totalPages = getPageCount();
+        for (let index = 0; index < totalPages; index += 1) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "org-profile-modal__dot" + (index === activePage ? " is-active" : "");
+            if (hasOverviewPage() && index === 0) {
+                button.setAttribute("aria-label", `Show ${activeGroup.label} overview`);
+            } else {
+                const memberIndex = hasOverviewPage() ? index - 1 : index;
+                const member = activeGroup.members[Math.max(0, memberIndex)];
+                button.setAttribute("aria-label", `Show ${member ? member.name : "member"}`);
+            }
+            button.addEventListener("click", function () {
+                activePage = index;
+                renderCurrentPage();
+            });
+            dotsNode.appendChild(button);
+        }
+    }
+
+    function renderCurrentPage() {
+        if (!activeGroup || !activeGroup.members.length) return;
+
+        titleNode.textContent = activeGroup.label;
+        themeNode.textContent = activeGroup.description || "Organization Unit";
+
+        if (isOverviewPage()) {
+            counterNode.textContent = "Overview";
+            nameNode.textContent = activeGroup.key === "executive" ? "Executive Team" : `${activeGroup.label} Team`;
+            roleNode.textContent = `${activeGroup.members.length} members`;
+            positionNode.textContent = "";
+            teamNode.textContent = "";
+            fieldsNode.innerHTML = executiveOverviewMarkup(activeGroup);
+            linkNode.href = "#";
+            linkNode.textContent = "";
+            linkNode.hidden = true;
+            emailNode.textContent = "";
+            phoneNode.textContent = "";
+            imageNode.hidden = true;
+            placeholderNode.hidden = true;
+            mediaNode.hidden = true;
+            showcaseNode.classList.add("is-overview");
+        } else {
+            const memberIndex = getMemberIndexFromPage();
+            const member = activeGroup.members[memberIndex];
+            const counterValue = hasOverviewPage() ? activePage : activePage + 1;
+
+            counterNode.textContent = `${counterValue} / ${activeGroup.members.length}`;
+            nameNode.textContent = member.name;
+            roleNode.textContent = member.role || "";
+            positionNode.textContent = member.position || "";
+            teamNode.textContent = member.team_name ? `Team: ${member.team_name}` : "";
+            fieldsNode.innerHTML = memberFieldsMarkup(member);
+            linkNode.href = member.profile_url || "#";
+            linkNode.textContent = "Open full profile";
+            linkNode.hidden = false;
+            emailNode.textContent = member.email ? `Email: ${member.email}` : "";
+            phoneNode.textContent = member.phone ? `Phone: ${member.phone}` : "";
+            mediaNode.hidden = false;
+            showcaseNode.classList.remove("is-overview");
+
+            if (member.image_url) {
+                imageNode.src = member.image_url;
+                imageNode.alt = member.name;
+                imageNode.hidden = false;
+                placeholderNode.hidden = true;
+            } else {
+                imageNode.hidden = true;
+                placeholderNode.hidden = false;
+                placeholderNode.textContent = (member.full_name || member.name || "?").trim().charAt(0);
+            }
+        }
+
+        renderDots();
+    }
+
+    function openGroup(groupKey) {
+        const group = groupsByKey[groupKey];
+        if (!group || !group.members.length) return;
+        activeGroup = group;
+        activePage = 0;
+        modal.hidden = false;
+        document.body.classList.add("modal-open");
+        renderCurrentPage();
+    }
+
+    function closeModal() {
+        modal.hidden = true;
+        document.body.classList.remove("modal-open");
+    }
+
+    document.querySelectorAll("[data-group-key]").forEach((button) => {
+        button.addEventListener("click", function () {
+            openGroup(button.dataset.groupKey);
+        });
+    });
+
+    modal.querySelectorAll("[data-org-close]").forEach((element) => {
+        element.addEventListener("click", closeModal);
+    });
+
+    modal.querySelector("[data-org-prev]").addEventListener("click", function () {
+        if (!activeGroup) return;
+        const totalPages = getPageCount();
+        activePage = (activePage - 1 + totalPages) % totalPages;
+        renderCurrentPage();
+    });
+
+    modal.querySelector("[data-org-next]").addEventListener("click", function () {
+        if (!activeGroup) return;
+        const totalPages = getPageCount();
+        activePage = (activePage + 1) % totalPages;
+        renderCurrentPage();
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (modal.hidden) return;
+        if (event.key === "Escape") closeModal();
+        if (event.key === "ArrowLeft") modal.querySelector("[data-org-prev]").click();
+        if (event.key === "ArrowRight") modal.querySelector("[data-org-next]").click();
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div id="content-main">
+    <div class="module aligned" style="max-width: 880px;">
+        <h1>Start text mining run</h1>
+        <p>Running analysis for all publications currently stored in the website.</p>
+        <form method="post">
+            {% csrf_token %}
+            <fieldset class="module aligned">
+                {{ form.as_p }}
+            </fieldset>
+            <div class="submit-row">
+                <input type="submit" value="Run analysis" class="default">
+                <a href="{% url 'admin:text_mining_textminingrun_changelist' %}" class="button cancel-link">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

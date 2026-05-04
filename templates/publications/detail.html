@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}{{ publication.title }} | Research Center{% endblock %}
+
+{% block content %}
+<section class="publication-detail-hero py-5 py-lg-6">
+    <div class="container">
+        <a href="/publications/" class="text-decoration-none">&larr; Back to publications</a>
+        <div class="row g-4 align-items-center mt-2">
+            <div class="col-lg-8">
+                <p class="eyebrow">Research Output</p>
+                <h1 class="display-5 fw-bold">{{ publication.title }}</h1>
+                <p class="lead">{{ publication.authors }}</p>
+                <div class="sdg-chip-list">
+                    {% for item in sdg_detail %}
+                        <span class="sdg-chip">SDG {{ item.number }} · {{ item.label }}</span>
+                    {% empty %}
+                        <span class="sdg-chip sdg-chip--empty">No SDG tagged</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="publication-detail-highlight">
+                    <p class="eyebrow">Quick Look</p>
+                    <div class="publication-detail-highlight__grid">
+                        <div>
+                            <div class="stat-number">{{ publication.journal_quartile|default:"-" }}</div>
+                            <div class="text-muted small">Quartile</div>
+                        </div>
+                        <div>
+                            <div class="stat-number">{{ publication.citescore|default:"-" }}</div>
+                            <div class="text-muted small">CiteScore</div>
+                        </div>
+                        <div>
+                            <div class="stat-number">{{ publication.impact_factor|default:"-" }}</div>
+                            <div class="text-muted small">Impact Factor</div>
+                        </div>
+                        <div>
+                            <div class="stat-number">{{ sdg_detail|length }}</div>
+                            <div class="text-muted small">SDGs</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="publication-detail-card">
+                    <p class="eyebrow">Abstract</p>
+                    <h2 class="mb-3">Research Summary</h2>
+                    <p class="publication-abstract">{{ publication.abstract|default:"No abstract yet." }}</p>
+                </div>
+
+                <div class="publication-detail-card mt-4">
+                    <p class="eyebrow">Authors</p>
+                    <h2 class="mb-3">Authorship</h2>
+                    <div class="metadata-list">
+                        <div class="metadata-list__row">
+                            <div class="metadata-list__label">All Authors</div>
+                            <div class="metadata-list__value">{{ publication.all_authors|default:publication.authors }}</div>
+                        </div>
+                        <div class="metadata-list__row">
+                            <div class="metadata-list__label">Corresponding Author</div>
+                            <div class="metadata-list__value">{{ publication.corresponding_author|default:"-" }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="publication-detail-card mt-4">
+                    <p class="eyebrow">Descriptors</p>
+                    <h2 class="mb-3">Keywords and Sustainability Scope</h2>
+                    <div class="metadata-list">
+                        <div class="metadata-list__row">
+                            <div class="metadata-list__label">Keywords</div>
+                            <div class="metadata-list__value">{{ publication.keywords|default:"-" }}</div>
+                        </div>
+                        <div class="metadata-list__row">
+                            <div class="metadata-list__label">SDG Goals</div>
+                            <div class="metadata-list__value">{{ publication.sdg_goals|default:"-" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="publication-detail-card publication-detail-card--sticky">
+                    <p class="eyebrow">Publication Record</p>
+                    <h2 class="mb-3">Metadata</h2>
+                    <div class="metadata-list">
+                        <div class="metadata-list__row">
+                            <div class="metadata-list__label">Journal</div>
+                            <div class="metadata-list__value">{{ publication.journal|default:"-" }}</div>
+                        </div>
+                        <div class="metadata-list__row">
+                            <div class="metadata-list__label">Published Date</div>
+                            <div class="metadata-list__value">{{ publication.published_date|default:"-" }}</div>
+                        </div>
+                        <div class="metadata-list__row">
+                            <div class="metadata-list__label">DOI</div>
+                            <div class="metadata-list__value">{{ publication.doi|default:"-" }}</div>
+                        </div>
+                        <div class="metadata-list__row">
+                            <div class="metadata-list__label">ISSN</div>
+                            <div class="metadata-list__value">{{ publication.issn|default:"-" }}</div>
+                        </div>
+                        <div class="metadata-list__row">
+                            <div class="metadata-list__label">Scopus EID</div>
+                            <div class="metadata-list__value">{{ publication.scopus_eid|default:"-" }}</div>
+                        </div>
+                    </div>
+
+                    {% if publication.external_url %}
+                        <a class="btn btn-dark mt-4" href="{{ publication.external_url }}">Open external link</a>
+                    {% endif %}
+                </div>
+
+                <div class="publication-detail-card mt-4">
+                    <p class="eyebrow">Journal Metrics</p>
+                    <h2 class="mb-3">Impact Snapshot</h2>
+                    <div class="metric-grid">
+                        <div class="metric-tile">
+                            <div class="metric-tile__label">Quartile</div>
+                            <div class="metric-tile__value">{{ publication.journal_quartile|default:"-" }}</div>
+                        </div>
+                        <div class="metric-tile">
+                            <div class="metric-tile__label">CiteScore</div>
+                            <div class="metric-tile__value">{{ publication.citescore|default:"-" }}</div>
+                        </div>
+                        <div class="metric-tile">
+                            <div class="metric-tile__label">SJR</div>
+                            <div class="metric-tile__value">{{ publication.sjr|default:"-" }}</div>
+                        </div>
+                        <div class="metric-tile">
+                            <div class="metric-tile__label">SNIP</div>
+                            <div class="metric-tile__value">{{ publication.snip|default:"-" }}</div>
+                        </div>
+                        <div class="metric-tile">
+                            <div class="metric-tile__label">Impact Factor</div>
+                            <div class="metric-tile__value">{{ publication.impact_factor|default:"-" }}</div>
+                        </div>
+                        <div class="metric-tile">
+                            <div class="metric-tile__label">Percentile</div>
+                            <div class="metric-tile__value">{{ publication.citescore_percentile|default:"-" }}</div>
+                        </div>
+                    </div>
+                    <div class="metadata-list mt-4">
+                        <div class="metadata-list__row">
+                            <div class="metadata-list__label">Quartile Basis</div>
+                            <div class="metadata-list__value">{{ publication.journal_quartile_basis|default:"-" }}</div>
+                        </div>
+                        <div class="metadata-list__row">
+                            <div class="metadata-list__label">Impact Source</div>
+                            <div class="metadata-list__value">{{ publication.impact_factor_source|default:"-" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

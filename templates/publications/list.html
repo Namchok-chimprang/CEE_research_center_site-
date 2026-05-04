@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Publications | Research Center{% endblock %}
+{% block body_class %}{% if admin_preview %}publications-admin-preview{% endif %}{% endblock %}
+
+{% block extra_head %}
+{{ sdg_summary|json_script:"sdg-tree-data" }}
+{{ sdg_featured|json_script:"sdg-featured-data" }}
+{{ tree_layouts|json_script:"sdg-tree-layouts-data" }}
+{% endblock %}
+
+{% block content %}
+{% if admin_preview %}
+<section class="py-5">
+    <div class="container">
+        {% include "publications/_sdg_tree_shell.html" with show_tree_controls=False initial_preset=initial_preset %}
+    </div>
+</section>
+{% else %}
+<section class="publications-hero py-5 py-lg-6">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-7">
+                <p class="eyebrow">Research Outputs</p>
+                <h1 class="display-5 fw-bold">Publications and Their SDG Footprint</h1>
+                <p class="lead text-secondary">
+                    This page turns the publication archive into a visible sustainability story. Each leaf in the tree
+                    shows how many papers connect to a specific SDG goal.
+                </p>
+                <div class="publication-hero-notes">
+                    <div class="publication-hero-note">
+                        <span class="publication-hero-note__label">Tree logic</span>
+                        <span class="publication-hero-note__text">Demo counts are used where SDGs do not yet have tagged papers.</span>
+                    </div>
+                    <div class="publication-hero-note">
+                        <span class="publication-hero-note__label">Interaction</span>
+                        <span class="publication-hero-note__text">Hover a leaf to inspect it, or click a leaf to filter the archive below.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="publication-summary-card">
+                    <p class="content-card__eyebrow mb-3">Archive Snapshot</p>
+                    <div class="row g-3 text-center">
+                        <div class="col-4">
+                            <div class="stat-number">{{ publication_cards|length }}</div>
+                            <div class="publication-summary-card__label">Papers</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-number">{{ max_sdg_count }}</div>
+                            <div class="publication-summary-card__label">Top Leaf</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-number">{{ active_sdg_count }}</div>
+                            <div class="publication-summary-card__label">SDGs Used</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        {% include "publications/_sdg_tree_shell.html" with show_tree_controls=True %}
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="section-heading">
+            <p class="eyebrow">Archive</p>
+            <h2>Publication Cards</h2>
+        </div>
+        <div class="publication-filter-bar">
+            <div id="publicationFilterLabel" class="publication-filter-label">Showing all publications</div>
+            <button id="clearPublicationFilter" class="btn btn-outline-dark publication-filter-clear" type="button" hidden>Clear filter</button>
+        </div>
+        <div class="row g-4">
+            {% for item in publication_cards %}
+                {% with publication=item.obj %}
+                <div class="col-md-6 publication-card-col" data-sdgs="{% for number in item.sdg_numbers %}{{ number }}{% if not forloop.last %},{% endif %}{% endfor %}">
+                    <div class="publication-card h-100">
+                        <div class="publication-card__body">
+                            <p class="eyebrow">Publication</p>
+                            <h2 class="h5">{{ publication.title }}</h2>
+                            <p class="publication-card__authors mb-1">{{ publication.authors }}</p>
+                            {% if publication.corresponding_author %}
+                                <p class="publication-card__meta small mb-1">Corresponding author: {{ publication.corresponding_author }}</p>
+                            {% endif %}
+                            <p class="publication-card__journal">{{ publication.journal }}</p>
+                            <div class="sdg-chip-list">
+                                {% for number in item.sdg_numbers %}
+                                    <span class="sdg-chip">SDG {{ number }}</span>
+                                {% empty %}
+                                    <span class="sdg-chip sdg-chip--empty">No SDG tagged</span>
+                                {% endfor %}
+                            </div>
+                            <a href="/publications/{{ publication.pk }}/" class="stretched-link">View details</a>
+                        </div>
+                    </div>
+                </div>
+                {% endwith %}
+            {% empty %}
+                <p class="text-muted">No publications available yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="/static/js/publications-tree.js"></script>
+{% endblock %}

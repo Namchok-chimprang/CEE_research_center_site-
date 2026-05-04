@@ -1,0 +1,131 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .tm-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 1.5rem; }
+    .tm-grid--double { grid-template-columns: 1.1fr 0.9fr; align-items: stretch; }
+    .tm-card { background: var(--body-bg); border: 1px solid var(--hairline-color); border-radius: 12px; padding: 1rem 1.1rem; }
+    .tm-card h3 { margin-top: 0; margin-bottom: 0.6rem; }
+    .tm-table { width: 100%; border-collapse: collapse; }
+    .tm-table th, .tm-table td { padding: 0.7rem; border-bottom: 1px solid var(--hairline-color); vertical-align: top; }
+    .tm-chip { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-weight: 600; }
+    .tm-bars { display: grid; gap: 0.75rem; margin-top: 1rem; }
+    .tm-bar-row { display: grid; gap: 0.35rem; }
+    .tm-bar-label { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.92rem; }
+    .tm-bar-track { height: 12px; background: rgba(148, 163, 184, 0.18); border-radius: 999px; overflow: hidden; }
+    .tm-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #38bdf8, #6366f1); }
+    .tm-cloud { display: flex; flex-wrap: wrap; gap: 0.8rem 1rem; align-items: center; justify-content: center; min-height: 240px; padding: 1rem; border-radius: 12px; background: radial-gradient(circle at top, rgba(59, 130, 246, 0.12), transparent 45%), rgba(15, 23, 42, 0.18); }
+    .tm-cloud-term { display: inline-flex; align-items: center; justify-content: center; line-height: 1; font-weight: 700; letter-spacing: 0.01em; }
+    .tm-meta { color: var(--body-quiet-color); font-size: 0.95rem; }
+    @media (max-width: 960px) { .tm-grid--double { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>Text mining dashboard</h1>
+    {% if latest_run %}
+        <div class="tm-grid">
+            <div class="tm-card">
+                <h3>Latest run</h3>
+                <p><strong>{{ latest_run.title }}</strong></p>
+                <p>Status: {{ latest_run.get_status_display }}</p>
+                <p>Publications analyzed: {{ latest_run.analyzed_count }}</p>
+                <p>Fields: {{ latest_run.source_fields|join:", " }}</p>
+            </div>
+            <div class="tm-card">
+                <h3>Frequent terms</h3>
+                <p class="tm-meta">Common filler words are filtered out and terms are ranked by TF-IDF score.</p>
+                <div class="tm-bars">
+                    {% for item in top_terms %}
+                        <div class="tm-bar-row">
+                            <div class="tm-bar-label">
+                                <span>{{ item.term }}</span>
+                                <strong>{{ item.score }} | {{ item.count }} hits</strong>
+                            </div>
+                            <div class="tm-bar-track">
+                                <div class="tm-bar-fill" style="width: {{ item.width_pct }}%;"></div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>No terms available.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="tm-card">
+                <h3>Topic summary</h3>
+                <div class="tm-bars">
+                    {% for item in topic_summary %}
+                        <div class="tm-bar-row">
+                            <div class="tm-bar-label">
+                                <span>{{ item.topic }}</span>
+                                <strong>{{ item.count }}</strong>
+                            </div>
+                            <div class="tm-bar-track">
+                                <div class="tm-bar-fill" style="width: {{ item.width_pct }}%;"></div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>No topic summary available.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="tm-grid tm-grid--double">
+            <div class="tm-card">
+                <h3>Word cloud</h3>
+                <p class="tm-meta">Terms from the latest run are sized by TF-IDF score.</p>
+                <div class="tm-cloud">
+                    {% for item in term_cloud %}
+                        <span class="tm-cloud-term" style="font-size: {{ item.font_size }}rem; color: {{ item.color }}; transform: rotate({{ item.rotate }}deg);">
+                            {{ item.term }}
+                        </span>
+                    {% empty %}
+                        <p>No word cloud available.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="tm-card">
+                <h3>How to read this</h3>
+                <p>Bar length shows relative TF-IDF strength in the latest completed run.</p>
+                <p>The word cloud highlights distinctive vocabulary across the center's publications.</p>
+                <p>To refresh the visuals, start a new analysis run after changing source fields.</p>
+            </div>
+        </div>
+
+        <div class="tm-card">
+            <h3>Recent publication-level results</h3>
+            <table class="tm-table">
+                <thead>
+                    <tr>
+                        <th>Publication</th>
+                        <th>Topic</th>
+                        <th>Keywords</th>
+                        <th>Summary</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                        <tr>
+                            <td>{{ result.publication.title }}</td>
+                            <td><span class="tm-chip">{{ result.primary_topic }}</span></td>
+                            <td>{{ result.generated_keywords }}</td>
+                            <td>{{ result.summary }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4">No publication-level results yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="tm-card">
+            <p>No completed text mining run yet. Start one from the text mining admin page.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

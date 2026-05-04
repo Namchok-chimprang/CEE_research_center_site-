@@ -1,0 +1,827 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Tree Editor | Research Center{% endblock %}
+{% block body_class %}tree-editor-clean{% endblock %}
+
+{% block extra_head %}
+{{ sdg_summary|json_script:"sdg-tree-data" }}
+{{ sdg_featured|json_script:"sdg-featured-data" }}
+{{ tree_layouts|json_script:"sdg-tree-layouts-data" }}
+<style>
+    body.tree-editor-clean .site-navbar,
+    body.tree-editor-clean .page-quick-links,
+    body.tree-editor-clean footer {
+        display: none !important;
+    }
+    body.tree-editor-clean main {
+        margin: 0;
+    }
+    .tree-editor-shell {
+        min-height: 100vh;
+        padding: 0.75rem 0 1rem;
+    }
+    .tree-editor-shell .container {
+        width: calc(100% - 1.5rem);
+        max-width: none;
+    }
+    .tree-editor-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 320px;
+        gap: 0.9rem;
+        align-items: start;
+    }
+    .tree-editor-preview,
+    .tree-editor-controls {
+        padding: 0.7rem;
+        border-radius: 1.4rem;
+        background: #fffdf9;
+        border: 1px solid rgba(31, 41, 51, 0.08);
+        box-shadow: 0 1rem 2rem rgba(16, 42, 67, 0.04);
+    }
+    .tree-editor-preview {
+        display: flex;
+        flex-direction: column;
+        min-height: auto;
+    }
+    .tree-editor-bottom {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 0.9rem;
+        align-items: start;
+    }
+    .tree-editor-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 0.6rem;
+    }
+    .tree-editor-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 0.75rem 1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(16, 42, 67, 0.12);
+        background: #102a43;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .tree-editor-btn--secondary {
+        background: rgba(255,255,255,0.92);
+        color: #102a43;
+    }
+    .tree-editor-box {
+        flex: 1;
+        overflow: hidden;
+    }
+    .tree-editor-preview-stage {
+        width: 100%;
+        overflow: hidden;
+    }
+    .tree-editor-preview-shell {
+        transform-origin: top left;
+        will-change: transform;
+    }
+    .tree-editor-preview .section-heading,
+    .tree-editor-preview .sdg-tree-legend {
+        display: none !important;
+    }
+    .tree-editor-preview .sdg-tree-shell {
+        padding: 1rem;
+        border-radius: 1.5rem;
+    }
+    .tree-editor-preview .sdg-tree-shell--canvas {
+        padding: 1rem;
+    }
+    .tree-editor-preview .sdg-tree-title {
+        margin-bottom: 0.75rem;
+    }
+    .tree-editor-preview .sdg-tree-canvas-wrap {
+        min-height: 640px;
+    }
+    .tree-editor-preview .sdg-tree-svg,
+    .tree-editor-preview .sdg-tree-svg svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    .tree-editor-controls {
+        position: sticky;
+        top: 1rem;
+        display: grid;
+        gap: 0.85rem;
+        align-items: start;
+    }
+    .tree-editor-card {
+        padding: 1rem;
+        border-radius: 1rem;
+        background: linear-gradient(180deg, #102a43 0%, #143d5d 100%);
+        color: #fff;
+    }
+    .tree-editor-card h3 {
+        margin: 0 0 0.75rem;
+        color: #fff;
+        font-size: 1.05rem;
+    }
+    .tree-editor-card--compact {
+        min-height: 100%;
+    }
+    .tree-editor-axis {
+        display: grid;
+        gap: 0.45rem;
+    }
+    .tree-editor-axis input[type="range"] {
+        width: 100%;
+    }
+    .tree-editor-values {
+        font-size: 0.92rem;
+        color: rgba(255,255,255,0.84);
+    }
+    .tree-editor-leaf-picker {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .tree-editor-leaf-picker button,
+    .tree-editor-nudge button {
+        min-width: 44px;
+        min-height: 40px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.08);
+        color: #fff;
+        font-weight: 700;
+    }
+    .tree-editor-leaf-picker button.is-selected {
+        background: #f8f1e6;
+        color: #102a43;
+        border-color: #f8f1e6;
+    }
+    .tree-editor-leaf-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.75rem;
+    }
+    .tree-editor-leaf-card {
+        padding: 0.9rem;
+        border-radius: 0.95rem;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.08);
+        color: #fff;
+        text-align: left;
+    }
+    .tree-editor-leaf-card.is-selected {
+        background: #f8f1e6;
+        color: #102a43;
+        border-color: #f8f1e6;
+        box-shadow: 0 0.8rem 1.6rem rgba(16, 42, 67, 0.14);
+    }
+    .tree-editor-leaf-card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.65rem;
+    }
+    .tree-editor-leaf-card-title {
+        font-weight: 700;
+        font-size: 0.98rem;
+    }
+    .tree-editor-leaf-card-swatch {
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        border: 2px solid rgba(255,255,255,0.72);
+        box-shadow: 0 0 0 1px rgba(16, 42, 67, 0.12);
+    }
+    .tree-editor-leaf-card-meta {
+        display: grid;
+        gap: 0.22rem;
+        font-size: 0.86rem;
+        color: inherit;
+        opacity: 0.92;
+    }
+    .tree-editor-leaf-card-controls {
+        display: grid;
+        gap: 0.65rem;
+        margin-top: 0.8rem;
+    }
+    .tree-editor-leaf-card-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+    }
+    .tree-editor-leaf-card-field {
+        display: grid;
+        gap: 0.28rem;
+    }
+    .tree-editor-leaf-card-field label {
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: inherit;
+        opacity: 0.84;
+    }
+    .tree-editor-leaf-card-field input[type="number"],
+    .tree-editor-leaf-card-field input[type="color"],
+    .tree-editor-leaf-card-field select {
+        width: 100%;
+        min-height: 38px;
+        padding: 0.55rem 0.7rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.92);
+        color: #102a43;
+    }
+    .tree-editor-leaf-card-field input[type="color"] {
+        padding: 0.2rem;
+    }
+    .tree-editor-leaf-card-field input[type="range"] {
+        width: 100%;
+    }
+    .tree-editor-selected {
+        display: grid;
+        gap: 0.85rem;
+    }
+    .tree-editor-nudge {
+        display: grid;
+        grid-template-columns: repeat(3, 44px);
+        gap: 0.4rem;
+        justify-content: start;
+    }
+    .tree-editor-empty {
+        opacity: 0;
+    }
+    .tree-editor-hidden {
+        display: none !important;
+    }
+    .tree-editor-meta {
+        display: grid;
+        gap: 0.65rem;
+    }
+    .tree-editor-form-store {
+        display: none !important;
+    }
+    .tree-editor-field {
+        display: grid;
+        gap: 0.35rem;
+    }
+    .tree-editor-field label {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: rgba(255,255,255,0.92);
+    }
+    .tree-editor-field input,
+    .tree-editor-field select {
+        width: 100%;
+        min-height: 40px;
+        padding: 0.65rem 0.75rem;
+        border-radius: 0.85rem;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.92);
+        color: #102a43;
+    }
+    @media (max-width: 991px) {
+        .tree-editor-grid {
+            grid-template-columns: 1fr;
+        }
+        .tree-editor-preview {
+            min-height: auto;
+        }
+        .tree-editor-preview .sdg-tree-canvas-wrap {
+            min-height: 640px;
+        }
+        .tree-editor-preview .sdg-tree-svg,
+        .tree-editor-preview .sdg-tree-svg svg {
+            height: 100%;
+        }
+        .tree-editor-controls {
+            position: static;
+        }
+        .tree-editor-bottom {
+            grid-template-columns: 1fr;
+        }
+        .tree-editor-controls {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="tree-editor-shell">
+    <div class="container">
+        <form method="post" id="treeEditorForm" novalidate>
+            <div class="tree-editor-grid">
+                {% csrf_token %}
+                <div class="tree-editor-preview">
+                    <div class="tree-editor-toolbar">
+                        <button type="submit" class="tree-editor-btn">Save Layout</button>
+                        <a href="/publications/" class="tree-editor-btn tree-editor-btn--secondary" target="_blank" rel="noopener">Open Live Page</a>
+                    </div>
+                    <div class="tree-editor-box">
+                        <div class="tree-editor-preview-stage">
+                            <div class="tree-editor-preview-shell">
+                                {% include "publications/_sdg_tree_shell.html" with show_tree_controls=False initial_preset=initial_preset %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="tree-editor-controls">
+                    <div class="tree-editor-card tree-editor-card--compact">
+                        <h3>Tree Size</h3>
+                        <div class="tree-editor-axis">
+                            <input id="treeEditorTreeSize" type="range" min="50" max="500" step="1" value="80" data-tree-editor-tree-size>
+                        </div>
+                        <div class="tree-editor-values" data-tree-editor-tree-size-value></div>
+                    </div>
+
+                    <div class="tree-editor-card tree-editor-card--compact">
+                        <h3>Leaf</h3>
+                        <div class="tree-editor-leaf-picker" data-tree-editor-leaf-picker></div>
+                    </div>
+
+                    <div class="tree-editor-card tree-editor-card--compact">
+                        <h3>Leaf Size</h3>
+                        <div class="tree-editor-axis">
+                            <label for="treeEditorBaseLeafSize">Base Size</label>
+                            <input id="treeEditorBaseLeafSize" type="range" min="20" max="120" step="1" value="52" data-tree-editor-base-leaf-size>
+                        </div>
+                        <div class="tree-editor-axis">
+                            <label for="treeEditorLeafSize">Size</label>
+                            <input id="treeEditorLeafSize" type="range" min="0.5" max="2.5" step="0.01" value="1" data-tree-editor-leaf-size>
+                        </div>
+                        <div class="tree-editor-values" data-tree-editor-leaf-style-value></div>
+                    </div>
+
+                    <div class="tree-editor-card tree-editor-card--compact">
+                        <h3>Nudge</h3>
+                        <div class="tree-editor-nudge">
+                            <span class="tree-editor-empty">.</span>
+                            <button type="button" data-tree-editor-nudge="up">Up</button>
+                            <span class="tree-editor-empty">.</span>
+                            <button type="button" data-tree-editor-nudge="left">Left</button>
+                            <button type="button" data-tree-editor-nudge="down">Down</button>
+                            <button type="button" data-tree-editor-nudge="right">Right</button>
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="tree-editor-bottom">
+                    <div class="tree-editor-card">
+                        <h3>Leaf Details</h3>
+                        <div class="tree-editor-leaf-summary" data-tree-editor-leaf-summary></div>
+                    </div>
+
+                    <div class="tree-editor-form-store">
+                        <div class="tree-editor-field">
+                            <label for="{{ form.preset_key.id_for_label }}">Preset</label>
+                            {{ form.preset_key }}
+                        </div>
+                        <div class="tree-editor-field">
+                            <label for="{{ form.leaf_count.id_for_label }}">Leaf Count</label>
+                            {{ form.leaf_count }}
+                        </div>
+                        <div class="tree-editor-field">
+                            <label for="{{ form.branch_image.id_for_label }}">Branch Image</label>
+                            {{ form.branch_image }}
+                        </div>
+                        <div class="tree-editor-field tree-editor-hidden">
+                            {{ form.title }}
+                            {{ form.is_active }}
+                            {{ form.branch_size }}
+                            {{ form.base_radius }}
+                            {{ form.radius_gain }}
+                            {{ form.default_leaf_scale }}
+                            {{ form.leaf_color }}
+                            {{ form.default_leaf_opacity }}
+                            {{ form.branch_position }}
+                        </div>
+                        {% for field in form %}
+                            {% if "leaf_" in field.name %}
+                            <div class="tree-editor-field tree-editor-hidden" data-anchor-field="{{ field.name }}">
+                                {{ field }}
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="{% static 'js/publications-tree.js' %}"></script>
+<script>
+(function () {
+    const wrap = document.querySelector(".sdg-tree-canvas-wrap");
+    const previewStage = document.querySelector(".tree-editor-preview-stage");
+    const previewShell = document.querySelector(".tree-editor-preview-shell");
+    const grid = document.querySelector(".tree-editor-grid");
+    const allNode = document.getElementById("sdg-tree-data");
+    const featuredNode = document.getElementById("sdg-featured-data");
+    const leafPicker = document.querySelector("[data-tree-editor-leaf-picker]");
+    const treeSizeRange = document.querySelector("[data-tree-editor-tree-size]");
+    const treeSizeValue = document.querySelector("[data-tree-editor-tree-size-value]");
+    const baseLeafSizeRange = document.querySelector("[data-tree-editor-base-leaf-size]");
+    const leafSizeRange = document.querySelector("[data-tree-editor-leaf-size]");
+    const leafStyleSummary = document.querySelector("[data-tree-editor-leaf-style-value]");
+    const leafSummary = document.querySelector("[data-tree-editor-leaf-summary]");
+    const presetInput = document.getElementById("id_preset_key");
+    const leafCountInput = document.getElementById("id_leaf_count");
+    const branchImageInput = document.getElementById("id_branch_image");
+    const branchSizeInput = document.getElementById("id_branch_size");
+    const branchPositionInput = document.getElementById("id_branch_position");
+    const baseRadiusInput = document.getElementById("id_base_radius");
+    const radiusGainInput = document.getElementById("id_radius_gain");
+    const leafScaleInput = document.getElementById("id_default_leaf_scale");
+    const storedLeafColorInput = document.getElementById("id_leaf_color");
+    const defaultLeafOpacityInput = document.getElementById("id_default_leaf_opacity");
+    const sdgData = allNode ? JSON.parse(allNode.textContent || "[]") : [];
+    const featuredData = featuredNode ? JSON.parse(featuredNode.textContent || "[]") : [];
+    let selectedLeafIndex = 1;
+
+    if (!wrap || !window.PublicationTreePage) return;
+
+    function syncPreviewScale() {
+        if (!previewStage || !previewShell || !grid) return;
+        const liveContainerWidth = Math.min(1180, window.innerWidth - 32);
+        const fullWidth = Math.max(320, liveContainerWidth);
+        const visibleWidth = previewStage.clientWidth;
+        const scale = visibleWidth / fullWidth;
+
+        previewShell.style.width = `${fullWidth}px`;
+        previewShell.style.transform = `scale(${scale})`;
+        previewStage.style.height = `${Math.ceil(previewShell.scrollHeight * scale)}px`;
+    }
+
+    function anchorInput(index, axis) {
+        return document.getElementById(`id_leaf_${index}_${axis}`);
+    }
+
+    function leafStyleInput(index, property) {
+        return document.getElementById(`id_leaf_${index}_${property}`);
+    }
+
+    function leafSdgInput(index) {
+        return document.getElementById(`id_leaf_${index}_sdg`);
+    }
+
+    function anchorValue(index, axis) {
+        const input = anchorInput(index, axis);
+        return input ? Number(input.value || 0) : 0;
+    }
+
+    function readValue(input, fallback) {
+        return input ? input.value : fallback;
+    }
+
+    function fieldWrapper(input) {
+        return input ? input.closest("[data-anchor-field]") : null;
+    }
+
+    function setAnchorValue(index, axis, value) {
+        const input = anchorInput(index, axis);
+        if (!input) return;
+        const safeValue = Math.max(0.05, Math.min(0.95, value));
+        input.value = safeValue.toFixed(3);
+    }
+
+    function getLeafStyleValue(index, property, fallback) {
+        const input = leafStyleInput(index, property);
+        return readValue(input, fallback);
+    }
+
+    function setLeafStyleValue(index, property, value) {
+        const input = leafStyleInput(index, property);
+        if (!input) return;
+        if (property === "scale") {
+            input.value = Math.max(0.5, Math.min(2.5, Number(value || 1))).toFixed(2);
+            return;
+        }
+        if (property === "opacity") {
+            input.value = Math.max(0.05, Math.min(1, Number(value || 0.42))).toFixed(2);
+            return;
+        }
+        input.value = String(value || "");
+    }
+
+    function parseTreeSize(rawValue) {
+        const match = String(rawValue || "").match(/(\d+(?:\.\d+)?)%/);
+        return match ? Number(match[1]) : 80;
+    }
+
+    function buildPreviewPreset() {
+        const branchImage = readValue(branchImageInput, "").replace(/^\/+/, "");
+        const leafCount = Number(readValue(leafCountInput, 5));
+        return {
+            title: "Tree editor",
+            leafCount,
+            branchImage: branchImage ? `/static/${branchImage}` : "",
+            branchSize: readValue(branchSizeInput, "80% auto"),
+            branchPosition: readValue(branchPositionInput, "center 76%"),
+            baseRadius: Number(readValue(baseRadiusInput, 52)),
+            radiusGain: Number(readValue(radiusGainInput, 18)),
+            defaultLeafScale: Number(readValue(leafScaleInput, 1)),
+            leafColor: readValue(storedLeafColorInput, "#6e8bdc"),
+            defaultLeafOpacity: Number(readValue(defaultLeafOpacityInput, 0.42)),
+            sdgNumbers: Array.from({ length: leafCount }, function (_, idx) {
+                const value = readValue(leafSdgInput(idx + 1), "");
+                return value ? Number(value) : null;
+            }),
+            anchors: Array.from({ length: leafCount }, function (_, idx) {
+                return {
+                    x: anchorValue(idx + 1, "x"),
+                    y: anchorValue(idx + 1, "y"),
+                    scale: Number(getLeafStyleValue(idx + 1, "scale", 1)),
+                    color: readValue(leafStyleInput(idx + 1, "color"), readValue(storedLeafColorInput, "#6e8bdc")),
+                    opacity: Number(getLeafStyleValue(idx + 1, "opacity", readValue(defaultLeafOpacityInput, 0.42))),
+                };
+            }),
+        };
+    }
+
+    function syncPreview() {
+        const presetKey = readValue(presetInput, "{{ initial_preset }}");
+        const previewLayout = buildPreviewPreset();
+        window.PublicationTreePage.updateLayouts({ [presetKey]: previewLayout });
+        window.PublicationTreePage.setPreset(presetKey);
+        requestAnimationFrame(syncPreviewScale);
+    }
+
+    function syncFieldVisibility() {
+        const leafCount = Number(readValue(leafCountInput, 5));
+        for (let index = 1; index <= 5; index += 1) {
+            [leafSdgInput(index), anchorInput(index, "x"), anchorInput(index, "y")].forEach((input) => {
+                const wrapper = fieldWrapper(input);
+                if (!wrapper) return;
+                wrapper.classList.toggle("tree-editor-hidden", index > leafCount);
+            });
+        }
+        if (selectedLeafIndex > leafCount) {
+            selectedLeafIndex = leafCount;
+        }
+    }
+
+    function syncLeafPicker() {
+        if (!leafPicker) return;
+        const leafCount = Number(readValue(leafCountInput, 5));
+        leafPicker.innerHTML = "";
+        for (let index = 1; index <= leafCount; index += 1) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.textContent = index;
+            button.classList.toggle("is-selected", index === selectedLeafIndex);
+            button.addEventListener("click", function () {
+                selectedLeafIndex = index;
+                syncLeafPicker();
+                syncLeafSummary();
+                syncRanges();
+            });
+            leafPicker.appendChild(button);
+        }
+    }
+
+    function syncLeafSummary() {
+        if (!leafSummary) return;
+        const leafCount = Number(readValue(leafCountInput, 5));
+        leafSummary.innerHTML = "";
+        for (let index = 1; index <= leafCount; index += 1) {
+            const selectedNumber = Number(readValue(leafSdgInput(index), "")) || null;
+            const item = (selectedNumber ? sdgData.find((entry) => entry.number === selectedNumber) : null) || featuredData[index - 1] || null;
+            const card = document.createElement("div");
+            card.className = "tree-editor-leaf-card";
+            card.classList.toggle("is-selected", index === selectedLeafIndex);
+            const color = String(readValue(leafStyleInput(index, "color"), readValue(storedLeafColorInput, "#6e8bdc")) || readValue(storedLeafColorInput, "#6e8bdc"));
+            const opacity = Math.round(Number(getLeafStyleValue(index, "opacity", readValue(defaultLeafOpacityInput, 0.42))) * 100);
+            const x = anchorValue(index, "x").toFixed(3);
+            const y = anchorValue(index, "y").toFixed(3);
+            const sdgOptions = ['<option value="">Auto</option>'].concat(
+                sdgData.map(function (entry) {
+                    const isSelected = selectedNumber === Number(entry.number) ? ' selected' : '';
+                    return `<option value="${entry.number}"${isSelected}>SDG ${entry.number} ${entry.label}</option>`;
+                })
+            ).join("");
+            card.innerHTML = `
+                <div class="tree-editor-leaf-card-head">
+                    <span class="tree-editor-leaf-card-title">${item ? `SDG ${item.number}` : `Leaf ${index}`}</span>
+                    <span class="tree-editor-leaf-card-swatch" style="background:${color}; opacity:${Math.max(0.2, opacity / 100)}"></span>
+                </div>
+                <div class="tree-editor-leaf-card-meta">
+                    <span>${item ? item.label : "No linked data"}</span>
+                    <span>${item ? `${item.visual_count} paper${item.visual_count === 1 ? "" : "s"}` : ""}</span>
+                    <span>Opacity ${opacity}%</span>
+                    <span>${color.toUpperCase()}</span>
+                </div>
+                <div class="tree-editor-leaf-card-controls">
+                    <div class="tree-editor-leaf-card-field">
+                        <label for="treeEditorLeaf${index}Sdg">Show SDG</label>
+                        <select id="treeEditorLeaf${index}Sdg">${sdgOptions}</select>
+                    </div>
+                    <div class="tree-editor-leaf-card-grid">
+                        <div class="tree-editor-leaf-card-field">
+                            <label for="treeEditorLeaf${index}X">X</label>
+                            <input id="treeEditorLeaf${index}X" type="number" min="0.05" max="0.95" step="0.005" value="${x}">
+                        </div>
+                        <div class="tree-editor-leaf-card-field">
+                            <label for="treeEditorLeaf${index}Y">Y</label>
+                            <input id="treeEditorLeaf${index}Y" type="number" min="0.05" max="0.95" step="0.005" value="${y}">
+                        </div>
+                    </div>
+                    <div class="tree-editor-leaf-card-grid">
+                        <div class="tree-editor-leaf-card-field">
+                            <label for="treeEditorLeaf${index}Color">Color</label>
+                            <input id="treeEditorLeaf${index}Color" type="color" value="${color}">
+                        </div>
+                        <div class="tree-editor-leaf-card-field">
+                            <label for="treeEditorLeaf${index}Opacity">Opacity ${opacity}%</label>
+                            <input id="treeEditorLeaf${index}Opacity" type="range" min="0.05" max="1" step="0.01" value="${(opacity / 100).toFixed(2)}">
+                        </div>
+                    </div>
+                </div>
+            `;
+            card.addEventListener("click", function () {
+                selectedLeafIndex = index;
+                syncLeafPicker();
+                syncLeafSummary();
+                syncRanges();
+            });
+            const sdgInput = card.querySelector(`#treeEditorLeaf${index}Sdg`);
+            const xInput = card.querySelector(`#treeEditorLeaf${index}X`);
+            const yInput = card.querySelector(`#treeEditorLeaf${index}Y`);
+            const colorInput = card.querySelector(`#treeEditorLeaf${index}Color`);
+            const opacityInput = card.querySelector(`#treeEditorLeaf${index}Opacity`);
+            if (sdgInput) {
+                sdgInput.addEventListener("input", function (event) {
+                    event.stopPropagation();
+                    selectedLeafIndex = index;
+                    if (leafSdgInput(index)) {
+                        leafSdgInput(index).value = sdgInput.value;
+                    }
+                    syncLeafPicker();
+                    syncLeafSummary();
+                    syncRanges();
+                    syncPreview();
+                });
+            }
+            if (xInput) {
+                xInput.addEventListener("input", function (event) {
+                    event.stopPropagation();
+                    selectedLeafIndex = index;
+                    setAnchorValue(index, "x", Number(xInput.value));
+                    syncLeafPicker();
+                    syncLeafSummary();
+                    syncRanges();
+                    syncPreview();
+                });
+            }
+            if (yInput) {
+                yInput.addEventListener("input", function (event) {
+                    event.stopPropagation();
+                    selectedLeafIndex = index;
+                    setAnchorValue(index, "y", Number(yInput.value));
+                    syncLeafPicker();
+                    syncLeafSummary();
+                    syncRanges();
+                    syncPreview();
+                });
+            }
+            if (colorInput) {
+                colorInput.addEventListener("input", function (event) {
+                    event.stopPropagation();
+                    selectedLeafIndex = index;
+                    setLeafStyleValue(index, "color", colorInput.value);
+                    syncLeafPicker();
+                    syncLeafSummary();
+                    syncRanges();
+                    syncPreview();
+                });
+            }
+            if (opacityInput) {
+                opacityInput.addEventListener("input", function (event) {
+                    event.stopPropagation();
+                    selectedLeafIndex = index;
+                    setLeafStyleValue(index, "opacity", opacityInput.value);
+                    syncLeafPicker();
+                    syncLeafSummary();
+                    syncRanges();
+                    syncPreview();
+                });
+            }
+            leafSummary.appendChild(card);
+        }
+    }
+
+    function syncRanges() {
+        if (treeSizeRange) treeSizeRange.value = String(parseTreeSize(readValue(branchSizeInput, "80% auto")));
+        if (baseLeafSizeRange) baseLeafSizeRange.value = String(readValue(baseRadiusInput, 52));
+        if (leafSizeRange) leafSizeRange.value = String(readValue(leafScaleInput, 1));
+        if (treeSizeValue) {
+            treeSizeValue.textContent = `Tree ${parseTreeSize(readValue(branchSizeInput, "80% auto"))}%`;
+        }
+        if (leafStyleSummary) {
+            leafStyleSummary.textContent = `Base ${Math.round(Number(readValue(baseRadiusInput, 52)))}px | All leaves ${Math.round(Number(readValue(leafScaleInput, 1)) * 100)}% size`;
+        }
+    }
+
+    function updateTreeSizeFromRange() {
+        if (!treeSizeRange || !branchSizeInput) return;
+        branchSizeInput.value = `${Number(treeSizeRange.value)}% auto`;
+        syncRanges();
+        syncPreview();
+    }
+
+    function updateLeafSizeFromRange() {
+        if (!leafSizeRange || !leafScaleInput) return;
+        leafScaleInput.value = Number(leafSizeRange.value).toFixed(2);
+        window.PublicationTreePage.setLeafScale(Number(leafScaleInput.value));
+        syncLeafSummary();
+        syncRanges();
+        syncPreview();
+    }
+
+    function updateBaseLeafSizeFromRange() {
+        if (!baseLeafSizeRange || !baseRadiusInput) return;
+        baseRadiusInput.value = String(Math.round(Number(baseLeafSizeRange.value)));
+        syncLeafSummary();
+        syncRanges();
+        syncPreview();
+    }
+
+
+    wrap.addEventListener("click", function (event) {
+        const rect = wrap.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width;
+        const y = (event.clientY - rect.top) / rect.height;
+        setAnchorValue(selectedLeafIndex, "x", x);
+        setAnchorValue(selectedLeafIndex, "y", y);
+        syncLeafSummary();
+        syncRanges();
+        syncPreview();
+    });
+
+    if (treeSizeRange) treeSizeRange.addEventListener("input", updateTreeSizeFromRange);
+    if (baseLeafSizeRange) baseLeafSizeRange.addEventListener("input", updateBaseLeafSizeFromRange);
+    if (leafSizeRange) leafSizeRange.addEventListener("input", updateLeafSizeFromRange);
+
+    document.querySelectorAll("[data-tree-editor-nudge]").forEach((button) => {
+        button.addEventListener("click", function () {
+            const step = 0.01;
+            const direction = button.dataset.treeEditorNudge;
+            if (direction === "up") setAnchorValue(selectedLeafIndex, "y", anchorValue(selectedLeafIndex, "y") - step);
+            if (direction === "down") setAnchorValue(selectedLeafIndex, "y", anchorValue(selectedLeafIndex, "y") + step);
+            if (direction === "left") setAnchorValue(selectedLeafIndex, "x", anchorValue(selectedLeafIndex, "x") - step);
+            if (direction === "right") setAnchorValue(selectedLeafIndex, "x", anchorValue(selectedLeafIndex, "x") + step);
+            syncLeafSummary();
+            syncRanges();
+            syncPreview();
+        });
+    });
+
+    [
+        presetInput,
+        leafCountInput,
+        branchImageInput,
+        branchSizeInput,
+        branchPositionInput,
+        baseRadiusInput,
+        radiusGainInput,
+        leafScaleInput,
+        storedLeafColorInput,
+        defaultLeafOpacityInput,
+        ...Array.from({ length: 5 }, (_, idx) => document.getElementById(`id_leaf_${idx + 1}_x`)),
+        ...Array.from({ length: 5 }, (_, idx) => document.getElementById(`id_leaf_${idx + 1}_y`)),
+        ...Array.from({ length: 5 }, (_, idx) => document.getElementById(`id_leaf_${idx + 1}_scale`)),
+        ...Array.from({ length: 5 }, (_, idx) => document.getElementById(`id_leaf_${idx + 1}_color`)),
+        ...Array.from({ length: 5 }, (_, idx) => document.getElementById(`id_leaf_${idx + 1}_opacity`))
+    ].filter(Boolean).forEach((input) => {
+        input.addEventListener("input", function () {
+            syncFieldVisibility();
+            syncLeafPicker();
+            syncLeafSummary();
+            syncRanges();
+            syncPreview();
+        });
+    });
+
+    window.addEventListener("resize", function () {
+        syncPreviewScale();
+        syncPreview();
+    });
+
+    syncFieldVisibility();
+    syncLeafPicker();
+    syncLeafSummary();
+    syncRanges();
+    syncPreview();
+})();
+</script>
+{% endblock %}
