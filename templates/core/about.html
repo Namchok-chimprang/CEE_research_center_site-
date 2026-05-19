@@ -1,97 +1,357 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{% load static %}
 
 {% block title %}About | Research Center{% endblock %}
 
-{% block content %}
-<section class="content-hero py-5 py-lg-6">
-    <div class="container">
-        <div class="row g-4 align-items-center">
-            <div class="col-lg-7">
-                <p class="eyebrow">About the Center</p>
-                <h1 class="display-5 fw-bold">Center of Excellence in Econometrics</h1>
-                <p class="lead text-secondary">
-                    ศูนย์วิจัยมุ่งพัฒนาองค์ความรู้ด้านเศรษฐมิติ งานวิจัยเชิงประจักษ์ และเครื่องมือวิเคราะห์เชิงนโยบาย
-                    เพื่อเชื่อมโยงงานวิชาการกับการตัดสินใจในโลกจริงอย่างมีคุณภาพ
-                </p>
-            </div>
-            <div class="col-lg-5">
-                <div class="content-hero__panel">
-                    <p class="content-card__eyebrow">Platform Focus</p>
-                    <h2 class="h3">What this website is designed to do</h2>
-                    <ul class="content-list">
-                        <li>แสดงภาพรวมของศูนย์วิจัย บุคลากร และโครงสร้างการทำงานอย่างชัดเจน</li>
-                        <li>รวบรวมผลงานวิจัย ข่าวสาร และข้อมูลติดต่อไว้ในที่เดียว</li>
-                        <li>เตรียมโครงสร้างข้อมูลให้พร้อมต่อยอดสู่ dashboard, API และ AI assistant ในอนาคต</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="py-5">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <article class="content-card">
-                    <span class="content-card__eyebrow">Vision</span>
-                    <h2 class="h4">วิสัยทัศน์</h2>
-                    <p class="text-secondary mb-0">
-                        สร้างศูนย์กลางองค์ความรู้ด้านเศรษฐมิติที่มีคุณภาพสูง สนับสนุนการวิจัย การเรียนรู้
-                        และการกำหนดนโยบายสาธารณะบนฐานของหลักฐานเชิงประจักษ์
-                    </p>
-                </article>
-            </div>
-            <div class="col-md-4">
-                <article class="content-card">
-                    <span class="content-card__eyebrow">Mission</span>
-                    <h2 class="h4">พันธกิจ</h2>
-                    <ul class="content-list">
-                        <li>ผลักดันงานวิจัยด้านเศรษฐมิติและเศรษฐศาสตร์ประยุกต์</li>
-                        <li>พัฒนานักวิจัยและเครือข่ายความร่วมมือทางวิชาการ</li>
-                        <li>ถ่ายทอดองค์ความรู้สู่ภาครัฐ ภาคเอกชน และสังคม</li>
-                    </ul>
-                </article>
-            </div>
-            <div class="col-md-4">
-                <article class="content-card content-card--dark">
-                    <span class="content-card__eyebrow">Future Ready</span>
-                    <h2 class="h4">พร้อมต่อยอดในอนาคต</h2>
-                    <p class="mb-0">
-                        เว็บไซต์ถูกออกแบบให้รองรับการเชื่อมต่อข้อมูลวิจัย ระบบค้นหาอัจฉริยะ
-                        และการใช้งานร่วมกับเครื่องมือวิเคราะห์หรือผู้ช่วย AI ได้ง่ายขึ้นในระยะถัดไป
-                    </p>
-                </article>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row g-4 align-items-center">
-            <div class="col-lg-6">
-                <div class="section-heading">
-                    <p class="eyebrow">Research Direction</p>
-                    <h2>พื้นที่งานหลักของศูนย์</h2>
-                </div>
-                <ul class="content-list mt-0">
-                    <li>เศรษฐมิติประยุกต์เพื่อการวิเคราะห์นโยบายและการประเมินผล</li>
-                    <li>แบบจำลองข้อมูลอนุกรมเวลา ความเสี่ยง และการพยากรณ์</li>
-                    <li>งานวิจัยที่เชื่อมโยงเศรษฐกิจ สังคม และความยั่งยืน</li>
-                </ul>
-            </div>
-            <div class="col-lg-6">
-                <div class="content-card">
-                    <span class="content-card__eyebrow">Why it matters</span>
-                    <h3 class="h4">จากงานวิจัยสู่การใช้งานจริง</h3>
-                    <p class="text-secondary mb-0">
-                        เป้าหมายของศูนย์ไม่ใช่เพียงการเก็บผลงานวิชาการไว้ในคลังข้อมูล แต่คือการทำให้ผลงานเหล่านั้น
-                        ถูกเข้าถึง เข้าใจ และนำไปใช้ประโยชน์ต่อได้ง่ายขึ้น ทั้งสำหรับนักวิจัย นักศึกษา และผู้กำหนดนโยบาย
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+{% block extra_head %}
+<style>
+.about-v3 {
+    --about-ink: #eaf2ff;
+    --about-text: #c6d6f0;
+    --about-muted: #92a6c7;
+    --about-surface: #0e1a2f;
+    --about-surface-soft: #12233f;
+    --about-border: rgba(154, 181, 220, 0.25);
+    --about-primary: #4ea3ff;
+    --about-gold: #e8c97a;
+    --about-cyan: #64e2e8;
+    background: linear-gradient(180deg, #081225 0%, #0a1730 100%);
+}
+.about-v3 section { padding: clamp(2.8rem, 6vw, 6rem) 0; }
+.about-v3 .about-shell { max-width: 1220px; margin: 0 auto; }
+.about-v3 h1, .about-v3 h2, .about-v3 h3 { color: var(--about-ink); line-height: 1.1; letter-spacing: -0.02em; }
+.about-v3 h1 { font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 800; max-width: 11ch; }
+.about-v3 h2 { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 700; }
+.about-v3 h3 { font-size: clamp(1.25rem, 2vw, 1.75rem); font-weight: 700; }
+.about-v3 p, .about-v3 li, .about-v3 a.btn, .about-v3 span { color: var(--about-text); }
+.about-v3 p, .about-v3 li { font-size: clamp(1rem, 1.2vw, 1.2rem); line-height: 1.72; }
+.about-v3 .about-eyebrow { font-size: clamp(0.78rem, 1vw, 0.92rem); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--about-cyan); margin-bottom: 0.8rem; }
+.about-v3 .about-card {
+    background: linear-gradient(170deg, rgba(17, 34, 61, 0.9), rgba(12, 28, 52, 0.95));
+    border: 1px solid var(--about-border);
+    border-radius: 1.25rem;
+    padding: clamp(1.25rem, 2.1vw, 2rem);
+    box-shadow: 0 12px 34px rgba(3, 10, 24, 0.26);
+    height: 100%;
+}
+.about-v3 .about-hero {
+    padding-top: clamp(3.8rem, 7vw, 6rem);
+    padding-bottom: clamp(2.2rem, 4vw, 3.8rem);
+    border-bottom: 1px solid var(--about-border);
+    background:
+      radial-gradient(circle at 12% 18%, rgba(78, 163, 255, 0.22), transparent 44%),
+      radial-gradient(circle at 85% 22%, rgba(100, 226, 232, 0.15), transparent 40%),
+      linear-gradient(180deg, #0a1833 0%, #091428 100%);
+}
+.about-v3 .about-hero-sub { max-width: 58ch; }
+.about-v3 .about-hero-visual {
+    min-height: 300px;
+    border-radius: 1.25rem;
+    border: 1px solid var(--about-border);
+    background: linear-gradient(145deg, rgba(14, 44, 84, 0.8), rgba(8, 24, 50, 0.95)), url('{% static "images/city-map-bg-alt.png" %}') center/cover no-repeat;
+    position: relative;
+    overflow: hidden;
+}
+.about-v3 .about-hero-visual::after {
+    content: "";
+    position: absolute;
+    inset: auto -12% -36% auto;
+    width: 340px;
+    height: 340px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232, 201, 122, 0.3), transparent 70%);
+}
+.about-v3 .about-actions { display: flex; gap: 0.85rem; flex-wrap: wrap; margin-top: 1.4rem; }
+.about-v3 .about-actions .btn { font-size: clamp(0.95rem, 1.1vw, 1.08rem); font-weight: 700; padding: 0.75rem 1.3rem; border-radius: 999px; }
+.about-v3 .btn-primary { background: var(--about-primary); border-color: var(--about-primary); color: #071222 !important; }
+.about-v3 .btn-outline-light { border-color: rgba(232, 241, 255, 0.5); color: #eaf2ff; }
+.about-v3 .about-stat strong { display: block; color: #f8fbff; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; line-height: 1; }
+.about-v3 .about-stat span { display: block; margin-top: 0.6rem; color: var(--about-muted); font-size: clamp(0.9rem, 1.1vw, 1rem); }
+.about-v3 .about-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.about-v3 .about-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.about-v3 .about-grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.about-v3 .about-icon-dot { width: 11px; height: 11px; border-radius: 50%; background: linear-gradient(135deg, var(--about-primary), var(--about-cyan)); display: inline-block; margin-right: 0.5rem; }
+.about-v3 .about-list { margin: 0; padding-left: 1.1rem; }
+.about-v3 .about-list li + li { margin-top: 0.45rem; }
+.about-v3 .about-chip { display: inline-block; border-radius: 999px; border: 1px solid var(--about-border); padding: 0.35rem 0.75rem; color: var(--about-muted); font-size: 0.82rem; margin: 0.2rem 0.25rem 0 0; }
+.about-v3 .about-cta { background: linear-gradient(160deg, rgba(18, 40, 73, 0.92), rgba(10, 25, 47, 0.96)); }
+.about-v3 .about-muted { color: var(--about-muted); }
+@media (max-width: 991.98px) {
+  .about-v3 .about-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .about-v3 .about-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 767.98px) {
+  .about-v3 .about-grid-2, .about-v3 .about-grid-3, .about-v3 .about-grid-4 { grid-template-columns: 1fr; }
+  .about-v3 .about-actions { flex-direction: column; }
+  .about-v3 .about-actions .btn { width: 100%; }
+}
+</style>
 {% endblock %}
+
+{% block content %}
+<div class="about-v3">
+    <section class="about-hero">
+        <div class="container about-shell">
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-7">
+                    <p class="about-eyebrow">Center of Excellence in Econometrics</p>
+                    <h1>Leading Econometrics for Real-World Impact</h1>
+                    <p class="about-hero-sub mt-3">We combine econometrics, AI, data science, and policy research to produce high-quality academic outputs and practical insights for sustainable economic and social development.</p>
+                    <div class="about-actions">
+                        <a href="{% url 'publications:list' %}" class="btn btn-primary">Explore Publications</a>
+                        <a href="{% url 'contacts:contact' %}" class="btn btn-outline-light">Collaboration Contact</a>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="about-hero-visual about-card">
+                        <p class="mb-2"><span class="about-icon-dot"></span>Established in 2013</p>
+                        <p class="mb-2"><span class="about-icon-dot"></span>32 Faculty Members and Researchers</p>
+                        <p class="mb-0"><span class="about-icon-dot"></span>50+ Domestic and International Partners</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container about-shell">
+            <div class="about-section-title mb-4">
+                <p class="about-eyebrow">About Overview</p>
+                <h2>Who We Are</h2>
+                <p class="mb-0">The Center of Excellence in Econometrics is a research center at Chiang Mai University focused on advanced econometric knowledge, quantitative economics, AI-integrated methods, and evidence-based policy solutions. The center works with domestic and international partners to produce high-quality research, develop analytical tools, transfer knowledge, and support policy decisions for sustainable development.</p>
+            </div>
+            <div class="about-grid-3 align-items-stretch">
+                <article class="about-card">
+                    <h3>Background</h3>
+                    <p class="mb-2">A research center at Chiang Mai University focused on advanced econometric tools, interdisciplinary collaboration, and evidence-based policy solutions for economic, social, and sustainable development.</p>
+                    <p class="about-muted mb-0">Founded in 2013</p>
+                </article>
+                <article class="about-card">
+                    <h3>Mission</h3>
+                    <p class="mb-0">Lead frontier econometric knowledge, develop practical analytical tools, support high-quality research, and translate quantitative evidence into policy and societal impact.</p>
+                </article>
+                <article class="about-card">
+                    <h3>Objectives</h3>
+                    <p class="mb-0">Advance econometric innovation, integrate research across disciplines and SDGs, and strengthen knowledge transfer through training, consulting, and academic services.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container about-shell">
+            <div class="about-section-title mb-4">
+                <p class="about-eyebrow">Impact Snapshot</p>
+                <h2>Key Impact Numbers</h2>
+            </div>
+            <div class="about-grid-4">
+                <article class="about-card about-stat"><strong>600+</strong><span>National and International Publications</span></article>
+                <article class="about-card about-stat"><strong>220+</strong><span>ISI Q1/Q2 Publications in the Last 3 Years</span></article>
+                <article class="about-card about-stat"><strong>32</strong><span>Faculty Members and Researchers</span></article>
+                <article class="about-card about-stat"><strong>50+</strong><span>Partner Institutions (17 Domestic, 33 International)</span></article>
+                <article class="about-card about-stat"><strong>10+</strong><span>Workshops and Knowledge-Transfer Activities per Year</span></article>
+                <article class="about-card about-stat"><strong>500+</strong><span>Participants Engaged per Year</span></article>
+                <article class="about-card about-stat"><strong>3 + 3</strong><span>CMU-RL 8-9 Recognized Innovations (+3 under consideration)</span></article>
+                <article class="about-card about-stat"><strong>20+</strong><span>CMU Faculty and Researchers in the Core Network</span></article>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container about-shell">
+            <div class="about-section-title mb-4">
+                <p class="about-eyebrow">Research Focus</p>
+                <h2>Research Focus Areas</h2>
+            </div>
+            <div class="about-grid-3">
+                <article class="about-card"><h3>Pure Econometrics</h3><p class="mb-0">Developing advanced econometric theory and frontier quantitative methods.</p></article>
+                <article class="about-card"><h3>Applied Econometrics</h3><p class="mb-0">Applying econometric tools to real-world economic, financial, social, and environmental challenges.</p></article>
+                <article class="about-card"><h3>AI Econometrics</h3><p class="mb-0">Integrating econometric modeling with artificial intelligence, machine learning, and data science.</p></article>
+                <article class="about-card"><h3>Quantum Econometrics</h3><p class="mb-0">Exploring emerging quantitative methods that connect econometrics with quantum-inspired analytical approaches.</p></article>
+                <article class="about-card"><h3>Policy &amp; Impact Research</h3><p class="mb-0">Translating empirical evidence into practical policy recommendations and social impact.</p></article>
+                <article class="about-card"><h3>Econometric Software Innovation</h3><p class="mb-0">Developing econometric tools, models, and software for research, policy analysis, and practical implementation.</p></article>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container about-shell">
+            <div class="about-section-title mb-4">
+                <p class="about-eyebrow">Research Groups</p>
+                <h2>Three Research Groups</h2>
+            </div>
+            <div class="about-grid-3">
+                <article class="about-card">
+                    <h3>High-Level Publication Research Group</h3>
+                    <p class="mb-0">Focuses on ISI Q1/Q2 publications with international professors in pure econometrics, AI econometrics, and quantum econometrics.</p>
+                </article>
+                <article class="about-card">
+                    <h3>Economy, Society, and Environment Research Group</h3>
+                    <p class="mb-0">Applies econometric tools to real-world data to generate policy recommendations and measurable social impact.</p>
+                </article>
+                <article class="about-card">
+                    <h3>Academic Services Group</h3>
+                    <p class="mb-0">Provides training, consulting, workshops, and knowledge transfer for universities, government agencies, the private sector, and the public.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container about-shell">
+            <div class="about-grid-2">
+                <article class="about-card">
+                    <p class="about-eyebrow">Research Excellence</p>
+                    <h2 class="mb-3">Research Excellence &amp; Innovation</h2>
+                    <p class="mb-0">The center transforms advanced econometric theory into applied tools, software, analytical models, and policy-relevant insights. This integration strengthens publication output, citation performance, institutional research reputation, and university ranking while improving real-world decision quality.</p>
+                </article>
+                <article class="about-card">
+                    <p class="about-eyebrow">Global Academic Strength</p>
+                    <h3 class="mb-3">International and Interdisciplinary Capacity</h3>
+                    <p>Our network includes more than 20 Chiang Mai University faculty and researchers, 12 international faculty and researchers, and over 50 partner institutions.</p>
+                    <span class="about-chip">Econometrics</span>
+                    <span class="about-chip">AI</span>
+                    <span class="about-chip">Data Science</span>
+                    <span class="about-chip">Policy Analytics</span>
+                    <span class="about-chip">SDG Research</span>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container about-shell">
+            <div class="about-section-title mb-4">
+                <p class="about-eyebrow">Research Expertise</p>
+                <h2>Core Strengths</h2>
+            </div>
+            <article class="about-card">
+                <div class="about-grid-2">
+                    <ul class="about-list mb-0">
+                        <li>Deep expertise in advanced econometrics and quantitative economics.</li>
+                        <li>Integration of econometrics with AI, quantum-inspired methods, and interdisciplinary analytics.</li>
+                        <li>International publication output that strengthens citation impact and research reputation.</li>
+                        <li>Strong domestic and international collaboration network.</li>
+                    </ul>
+                    <ul class="about-list mb-0">
+                        <li>Capacity to develop software tools, practical models, and policy-support systems.</li>
+                        <li>Consistent knowledge transfer through short courses, workshops, and advisory services.</li>
+                        <li>Policy-oriented research for economic, social, community, and environmental challenges.</li>
+                        <li>Contribution to university competitiveness and long-term research excellence.</li>
+                    </ul>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section>
+        <div class="container about-shell">
+            <div class="about-section-title mb-4">
+                <p class="about-eyebrow">Strategic Directions</p>
+                <h2>How We Build Long-Term Impact</h2>
+            </div>
+            <div class="about-grid-2">
+                <article class="about-card">
+                    <h3>World-class Knowledge Leadership</h3>
+                    <ul class="about-list mb-0">
+                        <li>Global workshops and scholar exchange with leading professors.</li>
+                        <li>Co-authored work in high-impact ISI Q1 journals.</li>
+                        <li>Frontier knowledge creation in econometrics, AI, and quantum approaches.</li>
+                    </ul>
+                </article>
+                <article class="about-card">
+                    <h3>Advanced Econometric Tools</h3>
+                    <ul class="about-list mb-0">
+                        <li>Method development from leading international literature.</li>
+                        <li>Applied model design for real policy and industry problems.</li>
+                        <li>Software and workflow innovation for econometric analysis.</li>
+                    </ul>
+                </article>
+                <article class="about-card">
+                    <h3>High-impact Research</h3>
+                    <ul class="about-list mb-0">
+                        <li>Competitive grant-driven research across national funding streams.</li>
+                        <li>Evidence-based studies for economy, society, environment, agriculture, tourism, and health.</li>
+                        <li>Policy recommendations with measurable outcomes.</li>
+                    </ul>
+                </article>
+                <article class="about-card">
+                    <h3>Consulting and Academic Services</h3>
+                    <ul class="about-list mb-0">
+                        <li>Consulting support for public, private, and educational sectors.</li>
+                        <li>Hands-on workshops in econometrics, analytics, and AI.</li>
+                        <li>Talent development for students and early-career researchers.</li>
+                    </ul>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container about-shell">
+            <div class="about-section-title mb-4">
+                <p class="about-eyebrow">Collaboration</p>
+                <h2>Collaboration Network &amp; Partnerships</h2>
+                <p class="mb-0">The center collaborates with domestic and international universities, government agencies, private organizations, research institutes, international professors, and community partners to expand research excellence and real-world impact.</p>
+            </div>
+            <div class="about-grid-3">
+                <article class="about-card"><h3>Domestic Universities</h3><p class="mb-0">Joint research, talent development, and shared research infrastructure.</p></article>
+                <article class="about-card"><h3>Government Agencies</h3><p class="mb-0">Policy analytics, evidence synthesis, and program impact evaluation.</p></article>
+                <article class="about-card"><h3>International Professors</h3><p class="mb-0">Co-authorship, advanced mentorship, and frontier methodology exchange.</p></article>
+                <article class="about-card"><h3>Research Institutes</h3><p class="mb-0">Collaborative research agendas and data-driven innovation projects.</p></article>
+                <article class="about-card"><h3>Private Sector</h3><p class="mb-0">Applied analytics, forecasting tools, and strategic research collaboration.</p></article>
+                <article class="about-card"><h3>Community Partners</h3><p class="mb-0">Local impact programs, inclusive growth, and sustainable development actions.</p></article>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container about-shell">
+            <div class="about-grid-2">
+                <article class="about-card">
+                    <p class="about-eyebrow">SDGs &amp; Societal Impact</p>
+                    <h2 class="mb-3">Evidence for Sustainable Development</h2>
+                    <p>The center contributes to sustainable development, social impact, policy recommendations, and real-world problem solving through rigorous quantitative evidence and interdisciplinary collaboration.</p>
+                    <span class="about-chip">SDG 4 Quality Education</span>
+                    <span class="about-chip">SDG 8 Decent Work and Economic Growth</span>
+                    <span class="about-chip">SDG 9 Industry, Innovation and Infrastructure</span>
+                    <span class="about-chip">SDG 10 Reduced Inequalities</span>
+                    <span class="about-chip">SDG 11 Sustainable Cities and Communities</span>
+                    <span class="about-chip">SDG 17 Partnerships for the Goals</span>
+                </article>
+                <article class="about-card">
+                    <p class="about-eyebrow">Academic Services</p>
+                    <h2 class="mb-3">Academic Services &amp; Training</h2>
+                    <p>The center provides short courses, workshops, consulting services, and knowledge-transfer programs in econometrics, data analytics, AI, and quantitative research methods for students, researchers, public agencies, private organizations, and the wider community.</p>
+                    <ul class="about-list mb-0">
+                        <li>Short courses and certificate workshops</li>
+                        <li>Consulting services and policy analytics support</li>
+                        <li>Knowledge transfer for universities, agencies, and communities</li>
+                    </ul>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container about-shell">
+            <article class="about-card about-cta">
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-8">
+                        <p class="about-eyebrow mb-2">Final Collaboration CTA</p>
+                        <h2 class="mb-2">Let’s Build Research Impact Together</h2>
+                        <p class="mb-0">We welcome partnerships across academia, government, industry, and international research networks to advance econometric knowledge and evidence-based policy solutions.</p>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="about-actions justify-content-lg-end">
+                            <a href="{% url 'researchers:list' %}" class="btn btn-outline-light">Meet the Researchers</a>
+                            <a href="{% url 'contacts:contact' %}" class="btn btn-primary">Contact the Center</a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+</div>
+{% endblock %}
+

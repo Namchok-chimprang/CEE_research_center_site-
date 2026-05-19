@@ -1,0 +1,28 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div id="content-main">
+    <h1>{{ title }}</h1>
+    <p>Upload a CSV file exported from your project sheet. The importer will create or update records in Research Projects.</p>
+
+    <form method="post" enctype="multipart/form-data" style="margin-top:1rem;max-width:680px;">
+        {% csrf_token %}
+        <fieldset class="module aligned">
+            <div class="form-row">
+                <label for="id_csv_file"><strong>CSV file</strong></label><br>
+                <input id="id_csv_file" type="file" name="csv_file" accept=".csv,text/csv" required>
+            </div>
+            <div class="form-row" style="margin-top:1rem;">
+                <label for="id_dry_run" style="display:flex;gap:0.6rem;align-items:center;">
+                    <input id="id_dry_run" type="checkbox" name="dry_run">
+                    Run as dry-run (validate only, no database changes)
+                </label>
+            </div>
+        </fieldset>
+        <div class="submit-row">
+            <input type="submit" class="default" value="Import CSV">
+            <a class="button cancel-link" href="{{ changelist_url }}">Back to Research Projects</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

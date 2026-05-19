@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }}{% endblock %}
+
+{% block content %}
+<section class="container py-5 project-detail-page">
+    <a href="{% url 'projects:list' %}" class="btn btn-outline-secondary btn-sm mb-4">Back to Projects</a>
+
+    <div class="card border-0 shadow-sm mb-4 project-detail-hero">
+        <div class="card-body p-4 p-lg-5">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="badge {% if project.status == 'ongoing' %}text-bg-success{% else %}text-bg-primary{% endif %}">
+                    {{ project.get_status_display }}
+                </span>
+                <span class="badge text-bg-light">{{ project.fiscal_year }}</span>
+                {% if project.is_featured %}<span class="badge text-bg-warning">Featured</span>{% endif %}
+            </div>
+            <h1 class="display-6 mb-3">{{ project.title }}</h1>
+            <p class="text-muted mb-0">{{ project.abstract|linebreaksbr }}</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100 project-detail-card">
+                <div class="card-body">
+                    <h2 class="h6 text-uppercase text-muted mb-3">Project Info</h2>
+                    <p class="mb-2"><strong>Funding Source:</strong> {{ project.funding_source }}</p>
+                    <p class="mb-2"><strong>Principal Investigator:</strong> {{ project.principal_investigator }}</p>
+                    <p class="mb-2"><strong>Budget:</strong> {{ project.budget_amount|floatformat:2 }}</p>
+                    <p class="mb-2"><strong>Start Date:</strong> {{ project.start_date|default:"-" }}</p>
+                    <p class="mb-0"><strong>End Date:</strong> {{ project.end_date|default:"-" }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100 project-detail-card">
+                <div class="card-body">
+                    <h2 class="h6 text-uppercase text-muted mb-3">Research Team</h2>
+                    <p class="mb-3"><strong>PI:</strong> {{ project.principal_investigator }}</p>
+                    <p class="mb-0">{{ project.co_investigators|linebreaksbr|default:"No co-investigator information yet." }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mt-3 project-detail-card">
+        <div class="card-body">
+            <h2 class="h6 text-uppercase text-muted mb-3">Outcomes and Notes</h2>
+            <p class="mb-0">{{ project.outcomes|linebreaksbr|default:"No outcomes recorded yet." }}</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

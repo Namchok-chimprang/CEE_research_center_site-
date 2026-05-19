@@ -9,7 +9,7 @@ from django.urls import path, reverse
 
 from .models import Researcher
 
-ADMIN_SYNC_COUNT = 20
+ADMIN_SYNC_COUNT = 500
 
 
 @admin.register(Researcher)
@@ -144,3 +144,4 @@ def mask_secret(value):
     if len(value) <= 8:
         return "*" * len(value)
     return f"{value[:4]}...{value[-4:]}"
+

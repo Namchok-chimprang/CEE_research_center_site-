@@ -20,7 +20,8 @@ SERIAL_TITLE_URL = "https://api.elsevier.com/content/serial/title"
 ABSTRACT_EID_URL = "https://api.elsevier.com/content/abstract/eid"
 OPENALEX_WORKS_URL = "https://api.openalex.org/works"
 SEMANTIC_SCHOLAR_PAPER_SEARCH_URL = "https://api.semanticscholar.org/graph/v1/paper/search"
-MAX_SYNC_COUNT = 20
+MAX_SYNC_COUNT = 500
+MAX_SCOPUS_RESULTS_PER_REQUEST = 25
 
 
 class Command(BaseCommand):
@@ -198,9 +199,14 @@ def build_query_from_researcher(researcher):
 
 def sync_query_into_publications(api_key, query, count, start, view, impact_factor_rows, stdout):
     stdout.write(f"Using Scopus query: {query}")
-    payload = search_scopus(api_key, query=query, count=count, start=start, view=view, stdout=stdout)
-
-    entries = payload.get("search-results", {}).get("entry", [])
+    entries = fetch_scopus_entries(
+        api_key=api_key,
+        query=query,
+        requested_count=count,
+        start=start,
+        view=view,
+        stdout=stdout,
+    )
     if not entries:
         stdout.write("No Scopus results were returned for this query.")
         return 0, 0, 0
@@ -273,6 +279,35 @@ def sync_query_into_publications(api_key, query, count, start, view, impact_fact
         )
 
     return created_count, updated_count, len(entries)
+
+
+def fetch_scopus_entries(api_key, query, requested_count, start, view, stdout):
+    entries = []
+    next_start = start
+
+    while len(entries) < requested_count:
+        remaining = requested_count - len(entries)
+        batch_size = min(remaining, MAX_SCOPUS_RESULTS_PER_REQUEST)
+        payload = search_scopus(
+            api_key,
+            query=query,
+            count=batch_size,
+            start=next_start,
+            view=view,
+            stdout=stdout,
+        )
+        batch_entries = payload.get("search-results", {}).get("entry", [])
+        if not batch_entries:
+            break
+
+        entries.extend(batch_entries)
+        next_start += len(batch_entries)
+
+        # Reached the end of the result set.
+        if len(batch_entries) < batch_size:
+            break
+
+    return entries
 
 
 def build_author_query(author_name):
@@ -883,3 +918,4 @@ def deduplicate_preserve_order(values):
         seen.add(key)
         result.append(key)
     return result
+

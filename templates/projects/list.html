@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Research Projects{% endblock %}
+
+{% block content %}
+<section class="container py-5 projects-page">
+    <div class="projects-hero d-flex flex-column flex-lg-row align-items-lg-end justify-content-between gap-3 mb-4">
+        <div>
+            <p class="text-uppercase small text-muted mb-1 projects-eyebrow">Research Portfolio</p>
+            <h1 class="display-6 mb-1">Research Projects</h1>
+            <p class="text-muted mb-0 projects-subtitle">Track funded projects, current progress, and completed outcomes.</p>
+        </div>
+        <div>
+            <a href="{% url 'projects:city' %}" class="btn btn-dark">Open Research City Map</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4 projects-stats">
+        <div class="col-6 col-lg-3 projects-stats__item">
+            <div class="card h-100 border-0 shadow-sm projects-stat-card">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Total Projects</p>
+                    <h3 class="mb-0">{{ summary_total_projects }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3 projects-stats__item">
+            <div class="card h-100 border-0 shadow-sm projects-stat-card">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Ongoing</p>
+                    <h3 class="mb-0 text-success">{{ summary_ongoing_projects }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3 projects-stats__item">
+            <div class="card h-100 border-0 shadow-sm projects-stat-card">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Completed</p>
+                    <h3 class="mb-0 text-primary">{{ summary_completed_projects }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3 projects-stats__item">
+            <div class="card h-100 border-0 shadow-sm projects-stat-card">
+                <div class="card-body">
+                    <p class="text-muted small mb-1">Total Budget</p>
+                    <h3 class="mb-0">{{ summary_total_budget|floatformat:0 }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="get" class="card border-0 shadow-sm mb-4 projects-filter-card">
+        <div class="card-body row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Search Project</label>
+                <input type="text" class="form-control" name="q" value="{{ search_query }}" placeholder="Project title">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Fiscal Year</label>
+                <select name="year" class="form-select">
+                    <option value="">All years</option>
+                    {% for year in available_years %}
+                    <option value="{{ year }}" {% if selected_year == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All statuses</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button class="btn btn-dark">Apply</button>
+            </div>
+        </div>
+    </form>
+
+    {% if featured_projects %}
+    <div class="mb-4">
+        <h2 class="h4 mb-3">Featured Projects</h2>
+        <div class="row g-3">
+            {% for project in featured_projects %}
+            <div class="col-md-6 col-xl-4">
+                <a href="{% url 'projects:detail' project.slug %}" class="card h-100 text-decoration-none border-warning-subtle border-2 shadow-sm projects-card projects-card--featured">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge text-bg-warning">Featured</span>
+                            <small class="text-muted">{{ project.fiscal_year }}</small>
+                        </div>
+                        <h3 class="h6 text-dark">{{ project.title }}</h3>
+                        <p class="text-muted small mb-1">{{ project.funding_source }}</p>
+                        <p class="text-muted small mb-0">PI: {{ project.principal_investigator }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="mb-4">
+        <h2 class="h4 mb-3">Ongoing Projects</h2>
+        <div class="row g-3">
+            {% for project in ongoing_projects %}
+            <div class="col-md-6">
+                <a href="{% url 'projects:detail' project.slug %}" class="card h-100 text-decoration-none shadow-sm projects-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge text-bg-success">Ongoing</span>
+                            <small class="text-muted">{{ project.fiscal_year }}</small>
+                        </div>
+                        <h3 class="h5 text-dark">{{ project.title }}</h3>
+                        <p class="text-muted mb-1">{{ project.funding_source }}</p>
+                        <p class="text-muted small mb-0">PI: {{ project.principal_investigator }}</p>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <p class="text-muted">No ongoing projects match this filter.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div>
+        <h2 class="h4 mb-3">Completed Projects</h2>
+        <div class="row g-3">
+            {% for project in completed_projects %}
+            <div class="col-md-6">
+                <a href="{% url 'projects:detail' project.slug %}" class="card h-100 text-decoration-none shadow-sm projects-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge text-bg-primary">Completed</span>
+                            <small class="text-muted">{{ project.fiscal_year }}</small>
+                        </div>
+                        <h3 class="h5 text-dark">{{ project.title }}</h3>
+                        <p class="text-muted mb-1">{{ project.funding_source }}</p>
+                        <p class="text-muted small mb-0">PI: {{ project.principal_investigator }}</p>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <p class="text-muted">No completed projects match this filter.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -8,6 +8,7 @@ urlpatterns = [
     path('api/', include('config.api_urls')),
     path('', include('apps.core.urls')),
     path('researchers/', include('apps.researchers.urls')),
+    path('projects/', include('apps.projects.urls')),
     path('publications/', include('apps.publications.urls')),
     path('news/', include('apps.news.urls')),
     path('contact/', include('apps.contacts.urls')),

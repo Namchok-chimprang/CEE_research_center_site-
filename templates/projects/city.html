@@ -1,0 +1,158 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Research City Map{% endblock %}
+{% block body_class %}city-fullscreen{% endblock %}
+
+{% block content %}
+<section class="city-page">
+    <div class="city-viewport">
+        <div class="city-topbar">
+            <div class="city-topbar__left">
+                <p class="city-kicker mb-0">Interactive Overview</p>
+                <h1 class="city-title mb-0">Research City Map</h1>
+            </div>
+            <div class="city-topbar__right">
+                <button type="button" class="btn btn-dark btn-sm city-panel-toggle" id="cityPanelToggle" aria-controls="cityPanel" aria-expanded="false">
+                    Project Details
+                </button>
+                <a class="btn btn-outline-dark btn-sm city-back-btn" href="{% url 'projects:list' %}">Back to Project List</a>
+            </div>
+        </div>
+
+        <div class="city-main">
+            <div class="city-map-shell">
+                <div class="city-map" id="cityMap">
+                    {% for category in categories %}
+                    <button
+                        type="button"
+                        class="city-node"
+                        data-category-slug="{{ category.slug }}"
+                        style="left: {{ category.map_x }}%; top: {{ category.map_y }}%; --city-color: {{ category.color }};"
+                    >
+                        <span class="city-node__head">
+                            <span class="city-node__title">{{ category.name }}</span>
+                        </span>
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <aside class="city-panel card border-0 shadow-sm is-closed" id="cityPanel" aria-hidden="true">
+                <div class="card-body">
+                    <div class="city-panel__head">
+                        <h2 class="h5 mb-0" id="panelTitle">Select a district</h2>
+                        <button type="button" class="city-panel__close" id="cityPanelClose" aria-label="Close project details">Close</button>
+                    </div>
+                    <p class="text-muted small mb-3" id="panelDescription">Choose a category on the map to see project details.</p>
+                    <p class="small mb-3"><strong id="panelCount">0</strong> projects</p>
+                    <div id="panelProjects" class="city-project-list"></div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(() => {
+    const dataUrl = "{% url 'projects:city_data' %}";
+    const nodes = Array.from(document.querySelectorAll(".city-node"));
+    const panelTitle = document.getElementById("panelTitle");
+    const panelDescription = document.getElementById("panelDescription");
+    const panelCount = document.getElementById("panelCount");
+    const panelProjects = document.getElementById("panelProjects");
+    const panel = document.getElementById("cityPanel");
+    const panelToggle = document.getElementById("cityPanelToggle");
+    const panelClose = document.getElementById("cityPanelClose");
+
+    function setPanelOpen(isOpen) {
+        panel.classList.toggle("is-open", isOpen);
+        panel.classList.toggle("is-closed", !isOpen);
+        panel.setAttribute("aria-hidden", String(!isOpen));
+        panelToggle.setAttribute("aria-expanded", String(isOpen));
+    }
+
+    function renderProjects(projects) {
+        panelProjects.replaceChildren();
+
+        if (!projects.length) {
+            const empty = document.createElement("p");
+            empty.className = "text-muted small mb-0";
+            empty.textContent = "No projects in this category yet.";
+            panelProjects.appendChild(empty);
+            return;
+        }
+
+        projects.forEach((project) => {
+            const card = document.createElement("article");
+            card.className = "city-project-card";
+
+            const meta = document.createElement("p");
+            meta.className = "city-project-card__meta mb-1";
+            meta.textContent = `${project.status} | ${project.fiscal_year}`;
+
+            const title = document.createElement("h3");
+            title.className = "h6 mb-1";
+            title.textContent = project.title || "Untitled project";
+
+            const pi = document.createElement("p");
+            pi.className = "small text-muted mb-2";
+            pi.textContent = `PI: ${project.principal_investigator || "-"}`;
+
+            const link = document.createElement("a");
+            link.className = "btn btn-sm btn-outline-dark";
+            link.href = project.detail_url;
+            link.textContent = "View Detail";
+
+            card.append(meta, title, pi, link);
+            panelProjects.appendChild(card);
+        });
+    }
+
+    function activateNode(slug, categoryBySlug) {
+        nodes.forEach((node) => node.classList.toggle("is-active", node.dataset.categorySlug === slug));
+        const category = categoryBySlug[slug];
+        if (!category) {
+            return;
+        }
+        panelTitle.textContent = category.name;
+        panelDescription.textContent = category.description || "No description provided yet.";
+        panelCount.textContent = String(category.project_count);
+        renderProjects(category.projects);
+        setPanelOpen(true);
+    }
+
+    panelToggle.addEventListener("click", () => {
+        const willOpen = !panel.classList.contains("is-open");
+        setPanelOpen(willOpen);
+    });
+
+    panelClose.addEventListener("click", () => {
+        setPanelOpen(false);
+    });
+
+    fetch(dataUrl)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Request failed with status ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((payload) => {
+            const categories = payload.categories || [];
+            const categoryBySlug = Object.fromEntries(categories.map((item) => [item.slug, item]));
+            nodes.forEach((node) => {
+                node.addEventListener("click", () => activateNode(node.dataset.categorySlug, categoryBySlug));
+            });
+            if (categories.length) {
+                activateNode(categories[0].slug, categoryBySlug);
+            }
+            setPanelOpen(false);
+        })
+        .catch(() => {
+            panelDescription.textContent = "Unable to load map data right now.";
+        });
+})();
+</script>
+{% endblock %}
