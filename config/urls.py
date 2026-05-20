@@ -14,5 +14,6 @@ urlpatterns = [
     path('contact/', include('apps.contacts.urls')),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Temporary production-safe fallback so media files are reachable on Render
+# when using local filesystem storage.
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
